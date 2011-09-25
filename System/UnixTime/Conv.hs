@@ -16,17 +16,18 @@ foreign import ccall unsafe "c_format_unix_time"
         c_format_unix_time :: CString -> CTime -> CString -> CInt -> IO ()
 
 formatUnixTime :: Format -> UnixTime -> IO ByteString
-formatUnixTime fmt ut = 
+formatUnixTime fmt (UnixTime sec _) =
     useAsCString fmt $ \cfmt -> do
         let siz = 256 -- FIXME
         ptr <- mallocBytes siz
-        c_format_unix_time cfmt ut ptr (fromIntegral siz)
+        c_format_unix_time cfmt sec ptr (fromIntegral siz)
         unsafePackMallocCString ptr
 
 parseUnixTime :: Format -> ByteString -> IO UnixTime
 parseUnixTime fmt str =
     useAsCString fmt $ \cfmt ->
-        useAsCString str $ \cstr ->
-            c_parse_unix_time cfmt cstr
+        useAsCString str $ \cstr -> do
+            sec <- c_parse_unix_time cfmt cstr
+            return $ UnixTime sec 0
 
 
