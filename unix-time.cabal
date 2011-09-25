@@ -1,0 +1,27 @@
+Name:                   unix-time
+Version:                0.0.0
+Author:                 Kazu Yamamoto <kazu@iij.ad.jp>
+Maintainer:             Kazu Yamamoto <kazu@iij.ad.jp>
+License:                BSD3
+License-File:           LICENSE
+Synopsis:               Unix time parser/formatter
+Description:            Fast parser and formatter for Unix time
+Category:               System
+Cabal-Version:          >= 1.6
+Build-Type:             Simple
+Extra-Source-Files:     cbits/conv.c
+library
+  if impl(ghc >= 6.12)
+    GHC-Options:        -Wall -fno-warn-unused-do-bind
+  else
+    GHC-Options:        -Wall
+  Exposed-Modules:      System.UnixTime
+  Other-Modules:        System.UnixTime.Sys
+                        System.UnixTime.Conv
+                        System.UnixTime.Types
+  Build-Depends:        base >= 4 && < 5,bytestring
+  C-Sources:            cbits/conv.c
+
+Source-Repository head
+  Type:                 git
+  Location:             git://github.com/kazu-yamamoto/http-date
