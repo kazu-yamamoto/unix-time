@@ -4,7 +4,10 @@ import Data.ByteString
 import Data.Int
 import Foreign.C.Types
 
-data UnixTime = UnixTime CTime Int32 deriving (Eq,Ord,Show)
+data UnixTime = UnixTime {
+    utSeconds :: CTime 
+  , utMicroSeconds :: Int32
+  } deriving (Eq,Ord,Show)
 
 type Format = ByteString
 
