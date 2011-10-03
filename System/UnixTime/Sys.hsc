@@ -20,6 +20,8 @@ type CTimeZone = ()
 foreign import ccall unsafe "gettimeofday"
     gettimeofday :: Ptr CTimeVal -> Ptr CTimeZone -> IO CInt
 
+{-| Getting 'UnixTime' from OS.
+-}
 getUnixTime :: IO UnixTime
 getUnixTime =
   allocaBytes (#const sizeof(struct timeval)) $ \ p_timeval -> do

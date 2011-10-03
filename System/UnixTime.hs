@@ -1,7 +1,14 @@
 module System.UnixTime (
-    module System.UnixTime.Conv
-  , module System.UnixTime.Sys
-  , module System.UnixTime.Types
+  -- * Data structure
+    UnixTime(..)
+  -- * Getting time
+  , getUnixTime
+  -- * Parsing and formatting time
+  , formatUnixTime
+  , parseUnixTime
+  , Format
+  , webDateFormat
+  , mailDateFormat
   ) where
 
 import System.UnixTime.Conv
