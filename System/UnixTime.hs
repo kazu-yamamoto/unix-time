@@ -5,10 +5,16 @@ module System.UnixTime (
   , getUnixTime
   -- * Parsing and formatting time
   , formatUnixTime
+  , formatUnixTimeGMT
   , parseUnixTime
   , Format
   , webDateFormat
   , mailDateFormat
+  -- * Translating time
+  , fromEpochTime
+  , toEpochTime
+  , fromClockTime
+  , toClockTime
   ) where
 
 import System.UnixTime.Conv
