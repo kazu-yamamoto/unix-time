@@ -1,12 +1,13 @@
-module System.UnixTime (
+module Data.UnixTime (
   -- * Data structure
     UnixTime(..)
   -- * Getting time
   , getUnixTime
   -- * Parsing and formatting time
+  , parseUnixTime
+  , parseUnixTimeGMT
   , formatUnixTime
   , formatUnixTimeGMT
-  , parseUnixTime
   , Format
   , webDateFormat
   , mailDateFormat
@@ -17,7 +18,6 @@ module System.UnixTime (
   , toClockTime
   ) where
 
-import System.UnixTime.Conv
-import System.UnixTime.Sys
-import System.UnixTime.Types
-
+import Data.UnixTime.Conv
+import Data.UnixTime.Sys
+import Data.UnixTime.Types

@@ -6,7 +6,7 @@ License:                BSD3
 License-File:           LICENSE
 Synopsis:               Unix time parser/formatter
 Description:            Fast parser and formatter for Unix time
-Category:               System
+Category:               Data
 Cabal-Version:          >= 1.6
 Build-Type:             Simple
 Extra-Source-Files:     cbits/conv.c
@@ -15,10 +15,10 @@ library
     GHC-Options:        -Wall -fno-warn-unused-do-bind
   else
     GHC-Options:        -Wall
-  Exposed-Modules:      System.UnixTime
-  Other-Modules:        System.UnixTime.Sys
-                        System.UnixTime.Conv
-                        System.UnixTime.Types
+  Exposed-Modules:      Data.UnixTime
+  Other-Modules:        Data.UnixTime.Conv
+                        Data.UnixTime.Types
+                        Data.UnixTime.Sys
   Build-Depends:        base >= 4 && < 5,bytestring, old-time
   C-Sources:            cbits/conv.c
 

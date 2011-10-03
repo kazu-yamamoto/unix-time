@@ -1,29 +1,60 @@
-{-# LANGUAGE ForeignFunctionInterface #-}
+{-# LANGUAGE OverloadedStrings, ForeignFunctionInterface #-}
 
-module System.UnixTime.Conv (
-    formatUnixTime, formatUnixTimeGMT, parseUnixTime
+module Data.UnixTime.Conv (
+    formatUnixTime, formatUnixTimeGMT
+  , parseUnixTime, parseUnixTimeGMT
+  , webDateFormat, mailDateFormat
   , fromEpochTime, toEpochTime
   , fromClockTime, toClockTime
   ) where
 
 import Data.ByteString
 import Data.ByteString.Unsafe
+import Data.UnixTime.Types
 import Foreign.C.String
 import Foreign.C.Types
 import Foreign.Marshal.Alloc
 import System.IO.Unsafe (unsafePerformIO)
 import System.Posix.Types (EpochTime)
 import System.Time (ClockTime(..))
-import System.UnixTime.Types
 
 foreign import ccall unsafe "c_parse_unix_time"
         c_parse_unix_time :: CString -> CString -> IO CTime
+
+foreign import ccall unsafe "c_parse_unix_time_gmt"
+        c_parse_unix_time_gmt :: CString -> CString -> IO CTime
 
 foreign import ccall unsafe "c_format_unix_time"
         c_format_unix_time :: CString -> CTime -> CString -> CInt -> IO ()
 
 foreign import ccall unsafe "c_format_unix_time_gmt"
         c_format_unix_time_gmt :: CString -> CTime -> CString -> CInt -> IO ()
+
+----------------------------------------------------------------
+
+{-| Parsing 'ByteString' to 'UnixTime' interpreting as localtime.
+    Zone in 'Format' (%Z or %z) would be ignored.
+    This is a wrapper for strptime_l().
+-}
+parseUnixTime :: Format -> ByteString -> UnixTime
+parseUnixTime fmt str = unsafePerformIO $
+    useAsCString fmt $ \cfmt ->
+        useAsCString str $ \cstr -> do
+            sec <- c_parse_unix_time cfmt cstr
+            return $ UnixTime sec 0
+
+{-| Parsing 'ByteString' to 'UnixTime' interpreting as GMT.
+    Zone in 'Format' (%Z or %z) would be ignored.
+    This is a wrapper for strptime_l().
+-}
+parseUnixTimeGMT :: Format -> ByteString -> UnixTime
+parseUnixTimeGMT fmt str = unsafePerformIO $
+    useAsCString fmt $ \cfmt ->
+        useAsCString str $ \cstr -> do
+            sec <- c_parse_unix_time_gmt cfmt cstr
+            return $ UnixTime sec 0
+
+----------------------------------------------------------------
 
 {-| Formatting 'UnixTime' to 'ByteString' in local time.
     This is a wrapper for strftime_l().
@@ -47,15 +78,19 @@ formatUnixTimeGMT fmt (UnixTime sec _) = unsafePerformIO $
         c_format_unix_time_gmt cfmt sec ptr (fromIntegral siz)
         unsafePackMallocCString ptr
 
-{-| Parsing 'ByteString' to 'UnixTime'.
-    This is a wrapper for strptime_l().
+----------------------------------------------------------------
+
+{-| Format for web (RFC 2616).
+    This should be used with 'formatUnixTimeGMT'.
 -}
-parseUnixTime :: Format -> ByteString -> UnixTime
-parseUnixTime fmt str = unsafePerformIO $
-    useAsCString fmt $ \cfmt ->
-        useAsCString str $ \cstr -> do
-            sec <- c_parse_unix_time cfmt cstr
-            return $ UnixTime sec 0
+webDateFormat :: Format
+webDateFormat = "%a, %d %b %Y %H:%M:%S GMT"
+
+{-| Format for e-mail (RFC 5322).
+    This should be used with 'formatUnixTime'.
+-}
+mailDateFormat :: Format
+mailDateFormat = "%a, %d %b %Y %H:%M:%S %z"
 
 ----------------------------------------------------------------
 

@@ -1,6 +1,4 @@
-{-# LANGUAGE OverloadedStrings #-}
-
-module System.UnixTime.Types where
+module Data.UnixTime.Types where
 
 import Data.ByteString
 import Data.ByteString.Char8 ()
@@ -18,14 +16,3 @@ data UnixTime = UnixTime {
 
 -- | Format of the strptime()/strftime() style.
 type Format = ByteString
-
-{-| Format for web (RFC 2616).
--}
-webDateFormat :: Format
-webDateFormat = "%a, %d %b %Y %H:%M:%S GMT"
-
-{-| Format for e-mail (RFC 5322).
--}
-mailDateFormat :: Format
-mailDateFormat = "%a, %d %b %Y %H:%M:%S %z"
-

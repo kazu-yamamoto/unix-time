@@ -1,5 +1,3 @@
-/* from snap-core */
-
 #include <time.h>
 #include <locale.h>
 #include <xlocale.h>
@@ -11,6 +9,13 @@ locale_t init_locale() {
 }
 
 time_t c_parse_unix_time(char *fmt, char *src) {
+    struct tm dst;
+    init_locale();
+    strptime_l(src, fmt, &dst, c_locale);
+    return mktime(&dst);
+}
+
+time_t c_parse_unix_time_gmt(char *fmt, char *src) {
     struct tm dst;
     init_locale();
     strptime_l(src, fmt, &dst, c_locale);

@@ -1,13 +1,13 @@
 {-# LANGUAGE ForeignFunctionInterface #-}
 
-module System.UnixTime.Sys (getUnixTime) where
+module Data.UnixTime.Sys (getUnixTime) where
 
+import Data.UnixTime.Types
 import Foreign.C.Error
 import Foreign.C.Types
 import Foreign.Marshal.Alloc
 import Foreign.Ptr
 import Foreign.Storable
-import System.UnixTime.Types
 
 -- from System.Time
 
