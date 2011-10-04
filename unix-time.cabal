@@ -4,8 +4,8 @@ Author:                 Kazu Yamamoto <kazu@iij.ad.jp>
 Maintainer:             Kazu Yamamoto <kazu@iij.ad.jp>
 License:                BSD3
 License-File:           LICENSE
-Synopsis:               Unix time parser/formatter
-Description:            Fast parser and formatter for Unix time
+Synopsis:               Unix time parser/formatter and utilities
+Description:            Fast parser/formatter/utilities for Unix time
 Category:               Data
 Cabal-Version:          >= 1.6
 Build-Type:             Simple
