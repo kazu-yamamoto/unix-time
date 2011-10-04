@@ -24,6 +24,7 @@ tests = [
        , testCase "formatParse" test_formatParse
        , testCase "fromClockTime" test_fromClockTime
        , testCase "toClockTime" test_toClockTime
+       , testCase "diffTime" test_diffTime
        ]
   ]
 
@@ -81,6 +82,17 @@ test_toClockTime = do
     cal <- toCalendarTime ct
     let fmt2 = BS.pack $ formatCalendarTime defaultTimeLocale "%a, %d %b %Y %H:%M:%S" cal
     fmt1 @?= fmt2
+
+----------------------------------------------------------------
+
+test_diffTime :: Assertion
+test_diffTime = do
+    ut0 <- getUnixTime
+    ut1 <- getUnixTime
+    let ut0' = addUnixDiffTime ut1 $ diffUnixTime ut0 ut1
+        ut1' = addUnixDiffTime ut0 $ diffUnixTime ut1 ut0
+    ut0' @?= ut0
+    ut1' @?= ut1
 
 ----------------------------------------------------------------
 

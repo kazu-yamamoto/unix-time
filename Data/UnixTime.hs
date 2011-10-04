@@ -11,6 +11,12 @@ module Data.UnixTime (
   , Format
   , webDateFormat
   , mailDateFormat
+  -- * Difference time
+  , UnixDiffTime
+  , diffUnixTime
+  , addUnixDiffTime
+  , secondsToUnixDiffTime
+  , microSecondsToUnixDiffTime
   -- * Translating time
   , fromEpochTime
   , toEpochTime
@@ -21,3 +27,4 @@ module Data.UnixTime (
 import Data.UnixTime.Conv
 import Data.UnixTime.Sys
 import Data.UnixTime.Types
+import Data.UnixTime.Diff
