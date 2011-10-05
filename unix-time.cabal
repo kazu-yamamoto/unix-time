@@ -1,10 +1,10 @@
 Name:                   unix-time
-Version:                0.0.0
+Version:                0.0.1
 Author:                 Kazu Yamamoto <kazu@iij.ad.jp>
 Maintainer:             Kazu Yamamoto <kazu@iij.ad.jp>
 License:                BSD3
 License-File:           LICENSE
-Synopsis:               Unix time parser\/formatter and utilities
+Synopsis:               Unix time parser/formatter and utilities
 Description:            Fast parser\/formatter\/utilities for Unix time
 Category:               Data
 Cabal-Version:          >= 1.6
@@ -25,4 +25,4 @@ library
 
 Source-Repository head
   Type:                 git
-  Location:             git://github.com/kazu-yamamoto/http-date
+  Location:             https://github.com/kazu-yamamoto/unix-time
