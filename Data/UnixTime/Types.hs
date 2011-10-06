@@ -8,13 +8,14 @@ import Foreign.C.Types
 -- | Data structure for Unix time.
 data UnixTime = UnixTime {
   -- | Seconds from 1st Jan 1970
-    utSeconds :: !CTime
+    utSeconds :: {-# UNPACK #-} !CTime
   -- | Micro seconds (i.e. 10^(-6))
-  , utMicroSeconds :: !Int32
+  , utMicroSeconds :: {-# UNPACK #-} !Int32
   } deriving (Eq,Ord,Show)
 
 -- | Format of the strptime()/strftime() style.
 type Format = ByteString
 
 -- | Data structure for UnixTime diff.
-data UnixDiffTime = UnixDiffTime !CTime !Int32 deriving (Eq,Ord,Show)
+data UnixDiffTime = UnixDiffTime {-# UNPACK #-} !CTime
+                                 {-# UNPACK #-} !Int32 deriving (Eq,Ord,Show)
