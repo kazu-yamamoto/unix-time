@@ -3,7 +3,6 @@
 
 #include <time.h>
 #include <locale.h>
-#include <xlocale.h>
 
 #ifdef HAVE_STRPTIME_L
 #define THREAD_SAFE 1
@@ -12,6 +11,8 @@
 #endif
 
 #if THREAD_SAFE
+#include <xlocale.h>
+
 locale_t c_locale = NULL;
 
 locale_t init_locale() {
