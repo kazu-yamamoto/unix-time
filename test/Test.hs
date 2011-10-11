@@ -4,12 +4,11 @@
   % runghc -i.. Test.hs
 -}
 
-module Test where
-
 import qualified Data.ByteString.Char8 as BS
 import Data.UnixTime
 import System.Locale
 import System.Time hiding (toClockTime)
+import System.Posix.Env (setEnv)
 import Test.Framework (defaultMain, testGroup, Test)
 import Test.Framework.Providers.HUnit
 import Test.HUnit hiding (Test)
@@ -97,4 +96,6 @@ test_diffTime = do
 ----------------------------------------------------------------
 
 main :: Assertion
-main = defaultMain tests
+main = do
+    setEnv "TZ" "UTC-9" True
+    defaultMain tests
