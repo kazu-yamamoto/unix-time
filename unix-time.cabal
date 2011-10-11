@@ -1,5 +1,5 @@
 Name:                   unix-time
-Version:                0.0.2
+Version:                0.0.3
 Author:                 Kazu Yamamoto <kazu@iij.ad.jp>
 Maintainer:             Kazu Yamamoto <kazu@iij.ad.jp>
 License:                BSD3
@@ -9,7 +9,7 @@ Description:            Fast parser\/formatter\/utilities for Unix time
 Category:               Data
 Cabal-Version:          >= 1.6
 Build-Type:             Configure
-Extra-Source-Files:     cbits/conv.c
+Extra-Source-Files:     cbits/conv.c cbits/config.h.in configure configure.ac
 Extra-Tmp-Files:        config.log config.status autom4te.cache cbits/config.h
   include/HsNetworkConfig.h
 library
