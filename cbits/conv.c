@@ -15,7 +15,7 @@
 
 locale_t c_locale = NULL;
 
-locale_t init_locale() {
+void init_locale() {
     if (c_locale == NULL) c_locale = newlocale(LC_TIME_MASK, NULL, NULL);
 }
 #else
