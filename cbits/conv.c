@@ -4,6 +4,7 @@
 #include <locale.h>
 
 #if IS_LINUX
+/* Linux cheats AC_CHECK_FUNCS(strptime_l), sigh. */
 #define THREAD_SAFE 0
 #define _XOPEN_SOURCE
 #elif HAVE_STRPTIME_L
