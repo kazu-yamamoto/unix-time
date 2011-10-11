@@ -19,10 +19,10 @@ locale_t init_locale() {
     if (c_locale == NULL) c_locale = newlocale(LC_TIME_MASK, NULL, NULL);
 }
 #else
-locale_t init_locale() {
+void init_locale() {
     static int initialized = 0;
     if (initialized == 0) {
-        set_locale(LC_TIME, "C");
+        setlocale(LC_TIME, "C");
 	initialized == 1;
     }
 }
