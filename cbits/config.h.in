@@ -1,7 +1,8 @@
 #ifndef __CONFIG_H__
 #define __CONFIG_H__
 
-/* Define to 1 if you have the `strptime_l' function. */
 #undef HAVE_STRPTIME_L
+
+#undef IS_LINUX
 
 #endif /* !__CONFIG_H__ */

@@ -1,10 +1,12 @@
 #include "config.h"
-#define _XOPEN_SOURCE
 
 #include <time.h>
 #include <locale.h>
 
-#ifdef HAVE_STRPTIME_L
+#if IS_LINUX
+#define THREAD_SAFE 0
+#define _XOPEN_SOURCE
+#elif HAVE_STRPTIME_L
 #define THREAD_SAFE 1
 #else
 #define THREAD_SAFE 0
