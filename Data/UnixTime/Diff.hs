@@ -22,6 +22,7 @@ calc' sec usec = uncurry UnixDiffTime . slowAjust sec $ usec
 calcU :: CTime -> Int32 -> UnixTime
 calcU sec usec = uncurry UnixTime . ajust sec $ usec
 
+-- | Arithmetic operations where (1::UnixDiffTime) means 1 second.
 instance Num UnixDiffTime where
 	UnixDiffTime s1 u1 + UnixDiffTime s2 u2 = calc (s1+s2) (u1+u2)
 	UnixDiffTime s1 u1 - UnixDiffTime s2 u2 = calc (s1-s2) (u1-u2)
@@ -32,8 +33,9 @@ instance Num UnixDiffTime where
          | s == 0 && u == 0 = 0
          | s > 0            = 1
          | otherwise        = -1
-	fromInteger i = UnixDiffTime (fromInteger s) (fromInteger u)
-         where (s,u) = secondMicro i
+	fromInteger i = UnixDiffTime (fromInteger i) 0
+
+{-# RULES "Int->UnixDiffTime" fromIntegral = secondsToUnixDiffTime #-}
 
 ----------------------------------------------------------------
 

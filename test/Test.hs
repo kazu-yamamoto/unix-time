@@ -25,6 +25,7 @@ tests = [
        , testCase "fromClockTime" test_fromClockTime
        , testCase "toClockTime" test_toClockTime
        , testCase "diffTime" test_diffTime
+       , testCase "diffTimeFromSeconds" test_diffTimeFromSeconds
        ]
   ]
 
@@ -93,6 +94,20 @@ test_diffTime = do
         ut1' = addUnixDiffTime ut0 $ diffUnixTime ut1 ut0
     ut0' @?= ut0
     ut1' @?= ut1
+
+----------------------------------------------------------------
+
+test_diffTimeFromSeconds :: Assertion
+test_diffTimeFromSeconds = do
+    res1 @?= ans
+    res2 @?= ans
+    res3 @?= ans
+  where
+    base = parseUnixTime mailDateFormat "Tue, 22 Nov 2011 06:49:58 +0900"
+    ans = parseUnixTime mailDateFormat "Tue, 22 Nov 2011 06:50:02 +0900"
+    res1 = addUnixDiffTime base 4
+    res2 = addUnixDiffTime base (secondsToUnixDiffTime 4)
+    res3 = addUnixDiffTime base (microSecondsToUnixDiffTime 4000000)
 
 ----------------------------------------------------------------
 
