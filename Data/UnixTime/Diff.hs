@@ -22,6 +22,7 @@ calc' sec usec = uncurry UnixDiffTime . slowAjust sec $ usec
 calcU :: CTime -> Int32 -> UnixTime
 calcU sec usec = uncurry UnixTime . ajust sec $ usec
 
+-- | Arithmetic operations where (1::UnixDiffTime) means 1 second.
 instance Num UnixDiffTime where
 	UnixDiffTime s1 u1 + UnixDiffTime s2 u2 = calc (s1+s2) (u1+u2)
 	UnixDiffTime s1 u1 - UnixDiffTime s2 u2 = calc (s1-s2) (u1-u2)
@@ -32,8 +33,14 @@ instance Num UnixDiffTime where
          | s == 0 && u == 0 = 0
          | s > 0            = 1
          | otherwise        = -1
-	fromInteger i = UnixDiffTime (fromInteger s) (fromInteger u)
-         where (s,u) = secondMicro i
+	fromInteger i = UnixDiffTime (fromInteger i) 0
+
+{-# RULES "Integral->UnixDiffTime" fromIntegral = secondsToUnixDiffTime #-}
+
+instance Real UnixDiffTime where
+        toRational = toFractional
+
+{-# RULES "UnixDiffTime->Fractional" realToFrac = toFractional #-}
 
 ----------------------------------------------------------------
 
@@ -46,14 +53,16 @@ addUnixDiffTime :: UnixTime -> UnixDiffTime -> UnixTime
 addUnixDiffTime (UnixTime s1 u1) (UnixDiffTime s2 u2) = calcU (s1+s2) (u1+u2)
 
 -- | Creating difference from seconds.
-secondsToUnixDiffTime :: Int -> UnixDiffTime
+secondsToUnixDiffTime :: (Integral a) => a -> UnixDiffTime
 secondsToUnixDiffTime sec = UnixDiffTime (fromIntegral sec) 0
+{-# INLINE secondsToUnixDiffTime #-}
 
 -- | Creating difference from micro seconds.
-microSecondsToUnixDiffTime :: Int -> UnixDiffTime
+microSecondsToUnixDiffTime :: (Integral a) => a -> UnixDiffTime
 microSecondsToUnixDiffTime usec = calc (fromIntegral s) (fromIntegral u)
   where
     (s,u) = secondMicro usec
+{-# INLINE microSecondsToUnixDiffTime #-}
 
 ----------------------------------------------------------------
 
@@ -80,3 +89,7 @@ slowAjust sec usec = (sec + fromIntegral s, usec - u)
 
 secondMicro :: Integral a => a -> (a,a)
 secondMicro usec = usec `quotRem` 1000000
+
+toFractional :: Fractional a => UnixDiffTime -> a
+toFractional (UnixDiffTime s u) = realToFrac s + realToFrac u / 1000000
+{-# SPECIALIZE toFractional :: UnixDiffTime -> Double #-}
