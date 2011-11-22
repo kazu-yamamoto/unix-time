@@ -35,7 +35,7 @@ instance Num UnixDiffTime where
          | otherwise        = -1
 	fromInteger i = UnixDiffTime (fromInteger i) 0
 
-{-# RULES "Int->UnixDiffTime" fromIntegral = secondsToUnixDiffTime #-}
+{-# RULES "Integral->UnixDiffTime" fromIntegral = secondsToUnixDiffTime #-}
 
 ----------------------------------------------------------------
 
@@ -48,14 +48,16 @@ addUnixDiffTime :: UnixTime -> UnixDiffTime -> UnixTime
 addUnixDiffTime (UnixTime s1 u1) (UnixDiffTime s2 u2) = calcU (s1+s2) (u1+u2)
 
 -- | Creating difference from seconds.
-secondsToUnixDiffTime :: Int -> UnixDiffTime
+secondsToUnixDiffTime :: (Integral a) => a -> UnixDiffTime
 secondsToUnixDiffTime sec = UnixDiffTime (fromIntegral sec) 0
+{-# INLINE secondsToUnixDiffTime #-}
 
 -- | Creating difference from micro seconds.
-microSecondsToUnixDiffTime :: Int -> UnixDiffTime
+microSecondsToUnixDiffTime :: (Integral a) => a -> UnixDiffTime
 microSecondsToUnixDiffTime usec = calc (fromIntegral s) (fromIntegral u)
   where
     (s,u) = secondMicro usec
+{-# INLINE microSecondsToUnixDiffTime #-}
 
 ----------------------------------------------------------------
 
