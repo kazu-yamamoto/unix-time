@@ -26,6 +26,7 @@ tests = [
        , testCase "toClockTime" test_toClockTime
        , testCase "diffTime" test_diffTime
        , testCase "diffTimeFromSeconds" test_diffTimeFromSeconds
+       , testCase "diffTimeToSeconds" test_diffTimeToSeconds
        ]
   ]
 
@@ -108,6 +109,16 @@ test_diffTimeFromSeconds = do
     res1 = addUnixDiffTime base 4
     res2 = addUnixDiffTime base (secondsToUnixDiffTime 4)
     res3 = addUnixDiffTime base (microSecondsToUnixDiffTime 4000000)
+
+----------------------------------------------------------------
+
+test_diffTimeToSeconds :: Assertion
+test_diffTimeToSeconds = do
+    res @?= ans
+  where
+    ans :: Rational
+    ans = -12.345678
+    res = realToFrac $ microSecondsToUnixDiffTime (-12345678 :: Int)
 
 ----------------------------------------------------------------
 

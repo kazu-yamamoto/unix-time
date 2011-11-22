@@ -37,6 +37,11 @@ instance Num UnixDiffTime where
 
 {-# RULES "Integral->UnixDiffTime" fromIntegral = secondsToUnixDiffTime #-}
 
+instance Real UnixDiffTime where
+        toRational = toFractional
+
+{-# RULES "UnixDiffTime->Fractional" realToFrac = toFractional #-}
+
 ----------------------------------------------------------------
 
 -- | Calculating difference between two 'UnixTime'.
@@ -84,3 +89,7 @@ slowAjust sec usec = (sec + fromIntegral s, usec - u)
 
 secondMicro :: Integral a => a -> (a,a)
 secondMicro usec = usec `quotRem` 1000000
+
+toFractional :: Fractional a => UnixDiffTime -> a
+toFractional (UnixDiffTime s u) = realToFrac s + realToFrac u / 1000000
+{-# SPECIALIZE toFractional :: UnixDiffTime -> Double #-}
