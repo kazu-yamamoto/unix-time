@@ -1,4 +1,4 @@
-{-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE OverloadedStrings, TemplateHaskell #-}
 
 {-
   % runghc -i.. Test.hs
@@ -10,74 +10,63 @@ import qualified Data.ByteString.Char8 as BS
 import Data.UnixTime
 import System.Locale
 import System.Time hiding (toClockTime)
-import Test.Framework (defaultMain, testGroup, Test)
 import Test.Framework.Providers.HUnit
-import Test.HUnit hiding (Test)
-
-tests :: [Test]
-tests = [
-    testGroup "Conf" [
-         testCase "formatUnixTime" test_formatUnixTime
-       , testCase "formatUnixTimeGMT" test_formatUnixTimeGMT
-       , testCase "parseUnixTime" test_parseUnixTime
-       , testCase "parseUnixTime2" test_parseUnixTime2
-       , testCase "formatParse" test_formatParse
-       , testCase "fromClockTime" test_fromClockTime
-       , testCase "toClockTime" test_toClockTime
-       , testCase "diffTime" test_diffTime
-       , testCase "diffTimeFromSeconds" test_diffTimeFromSeconds
-       , testCase "diffTimeToSeconds" test_diffTimeToSeconds
-       ]
-  ]
+import Test.Framework.TH
+import Test.HUnit
 
 ----------------------------------------------------------------
 
-test_formatUnixTime :: Assertion
-test_formatUnixTime = do
+main :: IO ()
+main = $(defaultMainGenerator)
+
+----------------------------------------------------------------
+
+case_formatUnixTime :: Assertion
+case_formatUnixTime = do
     res @?= ans
   where
     res = formatUnixTime mailDateFormat $ UnixTime 0 0
     ans = "Thu, 01 Jan 1970 09:00:00 +0900"
 
-test_formatUnixTimeGMT :: Assertion
-test_formatUnixTimeGMT = do
+case_formatUnixTimeGMT :: Assertion
+case_formatUnixTimeGMT = do
     res @?= ans
   where
     res = formatUnixTimeGMT webDateFormat $ UnixTime 0 0
     ans = "Thu, 01 Jan 1970 00:00:00 GMT"
 
-test_parseUnixTime :: Assertion
-test_parseUnixTime = do
+case_parseUnixTime :: Assertion
+case_parseUnixTime = do
     res @?= ans
   where
     res = parseUnixTime mailDateFormat "Thu, 01 Jan 1970 09:00:00 +0900"
     ans = UnixTime 0 0
 
-test_parseUnixTime2 :: Assertion
-test_parseUnixTime2 = do
+case_parseUnixTime2 :: Assertion
+case_parseUnixTime2 = do
     res @?= ans
   where
     res = parseUnixTimeGMT webDateFormat "Thu, 01 Jan 1970 00:00:00 GMT"
     ans = UnixTime 0 0
 
-test_formatParse :: Assertion
-test_formatParse = do
+case_formatParse :: Assertion
+case_formatParse = do
     ut@(UnixTime sec _) <- getUnixTime
     let ut' = parseUnixTime mailDateFormat $ formatUnixTime mailDateFormat ut
     ut' @?= UnixTime sec 0
 
 ----------------------------------------------------------------
 
-test_fromClockTime :: Assertion
-test_fromClockTime = do
+case_fromClockTime :: Assertion
+case_fromClockTime = do
     ct <- getClockTime
     let fmt1 = formatUnixTime "%a, %d %b %Y %H:%M:%S" $ fromClockTime ct
     cal <- toCalendarTime ct
     let fmt2 = BS.pack $ formatCalendarTime defaultTimeLocale "%a, %d %b %Y %H:%M:%S" cal
     fmt1 @?= fmt2
 
-test_toClockTime :: Assertion
-test_toClockTime = do
+case_toClockTime :: Assertion
+case_toClockTime = do
     ut <- getUnixTime
     let fmt1 = formatUnixTime "%a, %d %b %Y %H:%M:%S" ut
         ct = toClockTime ut
@@ -87,8 +76,8 @@ test_toClockTime = do
 
 ----------------------------------------------------------------
 
-test_diffTime :: Assertion
-test_diffTime = do
+case_diffTime :: Assertion
+case_diffTime = do
     ut0 <- getUnixTime
     ut1 <- getUnixTime
     let ut0' = addUnixDiffTime ut1 $ diffUnixTime ut0 ut1
@@ -98,8 +87,8 @@ test_diffTime = do
 
 ----------------------------------------------------------------
 
-test_diffTimeFromSeconds :: Assertion
-test_diffTimeFromSeconds = do
+case_diffTimeFromSeconds :: Assertion
+case_diffTimeFromSeconds = do
     res1 @?= ans
     res2 @?= ans
     res3 @?= ans
@@ -112,8 +101,8 @@ test_diffTimeFromSeconds = do
 
 ----------------------------------------------------------------
 
-test_diffTimeToSeconds :: Assertion
-test_diffTimeToSeconds = do
+case_diffTimeToSeconds :: Assertion
+case_diffTimeToSeconds = do
     res @?= ans
   where
     ans :: Rational
@@ -121,6 +110,3 @@ test_diffTimeToSeconds = do
     res = realToFrac $ microSecondsToUnixDiffTime (-12345678 :: Int)
 
 ----------------------------------------------------------------
-
-main :: Assertion
-main = defaultMain tests
