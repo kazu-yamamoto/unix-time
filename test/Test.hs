@@ -4,14 +4,14 @@
   % runghc -i.. Test.hs
 -}
 
-module Test where
+module Main where
 
 import qualified Data.ByteString.Char8 as BS
 import Data.UnixTime
 import System.Locale
 import System.Time hiding (toClockTime)
 import Test.Framework.Providers.HUnit
-import Test.Framework.TH
+import Test.Framework.TH.Prime
 import Test.HUnit
 
 ----------------------------------------------------------------
