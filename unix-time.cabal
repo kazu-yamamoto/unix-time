@@ -1,5 +1,5 @@
 Name:                   unix-time
-Version:                0.1.0
+Version:                0.1.1
 Author:                 Kazu Yamamoto <kazu@iij.ad.jp>
 Maintainer:             Kazu Yamamoto <kazu@iij.ad.jp>
 License:                BSD3
@@ -11,12 +11,9 @@ Cabal-Version:          >= 1.6
 Build-Type:             Configure
 Extra-Source-Files:     cbits/conv.c cbits/config.h.in configure configure.ac
 Extra-Tmp-Files:        config.log config.status autom4te.cache cbits/config.h
-  include/HsNetworkConfig.h
+
 library
-  if impl(ghc >= 6.12)
-    GHC-Options:        -Wall -fno-warn-unused-do-bind
-  else
-    GHC-Options:        -Wall
+  GHC-Options:          -Wall
   Exposed-Modules:      Data.UnixTime
   Other-Modules:        Data.UnixTime.Conv
                         Data.UnixTime.Diff
