@@ -1,17 +1,18 @@
 #include "config.h"
 
-#include <time.h>
-#include <locale.h>
-
 #if IS_LINUX
 /* Linux cheats AC_CHECK_FUNCS(strptime_l), sigh. */
 #define THREAD_SAFE 0
 #define _XOPEN_SOURCE
+#define _BSD_SOURCE
 #elif HAVE_STRPTIME_L
 #define THREAD_SAFE 1
 #else
 #define THREAD_SAFE 0
 #endif
+
+#include <time.h>
+#include <locale.h>
 
 #if THREAD_SAFE
 #include <xlocale.h>
