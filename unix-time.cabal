@@ -32,13 +32,12 @@ Test-Suite spec
   Main-Is:              Test.hs
   GHC-Options:          -Wall
   Build-Depends:        base
-                      , HUnit
                       , bytestring
+                      , hspec-expectations
                       , old-locale
                       , old-time
                       , test-framework-hunit
                       , test-framework-th-prime
-                      , unix
                       , unix-time
 
 Source-Repository head
