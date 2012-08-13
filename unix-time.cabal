@@ -7,12 +7,13 @@ License-File:           LICENSE
 Synopsis:               Unix time parser/formatter and utilities
 Description:            Fast parser\/formatter\/utilities for Unix time
 Category:               Data
-Cabal-Version:          >= 1.6
+Cabal-Version:          >= 1.10
 Build-Type:             Configure
 Extra-Source-Files:     cbits/conv.c cbits/config.h.in configure configure.ac
 Extra-Tmp-Files:        config.log config.status autom4te.cache cbits/config.h
 
-library
+Library
+  Default-Language:     Haskell2010
   GHC-Options:          -Wall
   Exposed-Modules:      Data.UnixTime
   Other-Modules:        Data.UnixTime.Conv
@@ -23,6 +24,22 @@ library
                       , bytestring
                       , old-time
   C-Sources:            cbits/conv.c
+
+Test-Suite spec
+  Type:                 exitcode-stdio-1.0
+  Default-Language:     Haskell2010
+  Hs-Source-Dirs:       test
+  Main-Is:              Test.hs
+  GHC-Options:          -Wall
+  Build-Depends:        base
+                      , HUnit
+                      , bytestring
+                      , old-locale
+                      , old-time
+                      , test-framework-hunit
+                      , test-framework-th-prime
+                      , unix
+                      , unix-time
 
 Source-Repository head
   Type:                 git

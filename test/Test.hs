@@ -1,9 +1,5 @@
 {-# LANGUAGE OverloadedStrings, TemplateHaskell #-}
 
-{-
-  % runghc -i.. Test.hs
--}
-
 module Main where
 
 import qualified Data.ByteString.Char8 as BS
@@ -96,8 +92,8 @@ case_diffTimeFromSeconds = do
     base = parseUnixTime mailDateFormat "Tue, 22 Nov 2011 06:49:58 +0900"
     ans = parseUnixTime mailDateFormat "Tue, 22 Nov 2011 06:50:02 +0900"
     res1 = addUnixDiffTime base 4
-    res2 = addUnixDiffTime base (secondsToUnixDiffTime 4)
-    res3 = addUnixDiffTime base (microSecondsToUnixDiffTime 4000000)
+    res2 = addUnixDiffTime base (secondsToUnixDiffTime (4 :: Int))
+    res3 = addUnixDiffTime base (microSecondsToUnixDiffTime (4000000 :: Int))
 
 ----------------------------------------------------------------
 
