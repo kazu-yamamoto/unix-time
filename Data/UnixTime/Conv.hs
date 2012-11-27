@@ -49,7 +49,7 @@ parseUnixTime fmt str = unsafePerformIO $
 -- This is a wrapper for strptime_l().
 --
 -- >>> parseUnixTimeGMT webDateFormat "Thu, 01 Jan 1970 00:00:00 GMT"
--- UnixTime 0 0
+-- UnixTime {utSeconds = 0, utMicroSeconds = 0}
 
 parseUnixTimeGMT :: Format -> ByteString -> UnixTime
 parseUnixTimeGMT fmt str = unsafePerformIO $
