@@ -39,6 +39,7 @@ Test-Suite spec
                       , test-framework-hunit
                       , test-framework-th-prime
                       , unix-time
+                      , time
 
 Source-Repository head
   Type:                 git

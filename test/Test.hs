@@ -3,6 +3,7 @@
 module Main where
 
 import qualified Data.ByteString.Char8 as BS
+import Data.Time
 import Data.UnixTime
 import System.Locale
 import System.Time hiding (toClockTime)
@@ -17,11 +18,21 @@ main = $(defaultMainGenerator)
 
 ----------------------------------------------------------------
 
+unixTime0 :: UTCTime
+unixTime0 = UTCTime {
+    utctDay = ModifiedJulianDay 40587
+  , utctDayTime = secondsToDiffTime 0
+  }
+
 case_formatUnixTime :: Expectation
-case_formatUnixTime = res `shouldBe` ans
+case_formatUnixTime = do
+    tz <- getCurrentTimeZone
+    res `shouldBe` ans tz
   where
     res = formatUnixTime mailDateFormat $ UnixTime 0 0
-    ans = "Thu, 01 Jan 1970 09:00:00 +0900"
+    fmt = "%a, %d %b %Y %H:%M:%S %z"
+    toZoneTime tz = utcToZonedTime tz unixTime0
+    ans tz = BS.pack $ formatTime defaultTimeLocale fmt $ toZoneTime tz
 
 case_formatUnixTimeGMT :: Expectation
 case_formatUnixTimeGMT = res `shouldBe` ans
