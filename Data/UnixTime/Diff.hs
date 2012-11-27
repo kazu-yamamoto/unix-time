@@ -14,15 +14,16 @@ import Foreign.C.Types
 ----------------------------------------------------------------
 
 calc :: CTime -> Int32 -> UnixDiffTime
-calc sec usec = uncurry UnixDiffTime . ajust sec $ usec
+calc sec usec = uncurry UnixDiffTime . adjust sec $ usec
 
 calc' :: CTime -> Int32 -> UnixDiffTime
-calc' sec usec = uncurry UnixDiffTime . slowAjust sec $ usec
+calc' sec usec = uncurry UnixDiffTime . slowAdjust sec $ usec
 
 calcU :: CTime -> Int32 -> UnixTime
-calcU sec usec = uncurry UnixTime . ajust sec $ usec
+calcU sec usec = uncurry UnixTime . adjust sec $ usec
 
 -- | Arithmetic operations where (1::UnixDiffTime) means 1 second.
+
 instance Num UnixDiffTime where
 	UnixDiffTime s1 u1 + UnixDiffTime s2 u2 = calc (s1+s2) (u1+u2)
 	UnixDiffTime s1 u1 - UnixDiffTime s2 u2 = calc (s1-s2) (u1-u2)
@@ -45,19 +46,36 @@ instance Real UnixDiffTime where
 ----------------------------------------------------------------
 
 -- | Calculating difference between two 'UnixTime'.
+--
+-- >>> UnixTime 100 2000 `diffUnixTime` UnixTime 98 2100
+-- UnixDiffTime 1 999900
+--
+
 diffUnixTime :: UnixTime -> UnixTime -> UnixDiffTime
 diffUnixTime (UnixTime s1 u1) (UnixTime s2 u2) = calc (s1-s2) (u1-u2)
 
 -- | Adding difference to 'UnixTime'.
+--
+-- >>> UnixTime 100 2000 `addUnixDiffTime` microSecondsToUnixDiffTime (-1003000)
+-- UnixTime {utSeconds = 98, utMicroSeconds = 999000}
+
 addUnixDiffTime :: UnixTime -> UnixDiffTime -> UnixTime
 addUnixDiffTime (UnixTime s1 u1) (UnixDiffTime s2 u2) = calcU (s1+s2) (u1+u2)
 
 -- | Creating difference from seconds.
+--
+-- >>> secondsToUnixDiffTime 100
+-- UnixDiffTime 100 0
+
 secondsToUnixDiffTime :: (Integral a) => a -> UnixDiffTime
 secondsToUnixDiffTime sec = UnixDiffTime (fromIntegral sec) 0
 {-# INLINE secondsToUnixDiffTime #-}
 
 -- | Creating difference from micro seconds.
+--
+-- >>> microSecondsToUnixDiffTime 12345678
+-- UnixDiffTime 12 345678
+
 microSecondsToUnixDiffTime :: (Integral a) => a -> UnixDiffTime
 microSecondsToUnixDiffTime usec = calc (fromIntegral s) (fromIntegral u)
   where
@@ -66,8 +84,8 @@ microSecondsToUnixDiffTime usec = calc (fromIntegral s) (fromIntegral u)
 
 ----------------------------------------------------------------
 
-ajust :: CTime -> Int32 -> (CTime, Int32)
-ajust sec usec
+adjust :: CTime -> Int32 -> (CTime, Int32)
+adjust sec usec
   | sec >= 0  = ajp
   | otherwise = ajm
   where
@@ -79,11 +97,11 @@ ajust sec usec
      | otherwise      = (sec - 1, usec + micro)
     ajm
      | usec <= mmicro = (sec - 1, usec + micro)
-     | usec < 0       = (sec, usec)
+     | usec <= 0      = (sec, usec)
      | otherwise      = (sec + 1, usec - micro)
 
-slowAjust :: CTime -> Int32 -> (CTime, Int32)
-slowAjust sec usec = (sec + fromIntegral s, usec - u)
+slowAdjust :: CTime -> Int32 -> (CTime, Int32)
+slowAdjust sec usec = (sec + fromIntegral s, usec - u)
   where
     (s,u) = secondMicro u
 
