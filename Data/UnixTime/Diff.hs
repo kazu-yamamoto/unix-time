@@ -106,7 +106,7 @@ adjust sec usec
 slowAdjust :: CTime -> Int32 -> (CTime, Int32)
 slowAdjust sec usec = (sec + fromIntegral s, usec - u)
   where
-    (s,u) = secondMicro u
+    (s,u) = secondMicro usec
 
 secondMicro :: Integral a => a -> (a,a)
 secondMicro usec = usec `quotRem` 1000000
