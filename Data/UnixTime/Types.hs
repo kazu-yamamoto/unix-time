@@ -25,6 +25,8 @@ type Format = ByteString
 -- UnixDiffTime 5 0
 -- >>> (2 :: UnixDiffTime) - 5
 -- UnixDiffTime (-3) 0
+-- >>> (3 :: UnixDiffTime) * 2
+-- UnixDiffTime 6 0
 
 data UnixDiffTime = UnixDiffTime {-# UNPACK #-} !CTime
                                  {-# UNPACK #-} !Int32 deriving (Eq,Ord,Show)
