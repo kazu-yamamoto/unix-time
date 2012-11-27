@@ -19,34 +19,34 @@ utcTime0 = UTCTime {
 unixTime0 :: UnixTime
 unixTime0 = UnixTime 0 0
 
-mailDateFormat' :: String
-mailDateFormat' = BS.unpack mailDateFormat
-
-gmt1970 :: ByteString
-gmt1970 = "Thu, 01 Jan 1970 00:00:00 GMT"
-
+{- timezone cannot be parsed by some strptime_l().
 jst1970 :: ByteString
 jst1970 = "Thu, 01 Jan 1970 09:00:00 +0900"
+-}
 
 spec :: Spec
 spec = do
-    describe "formatUnixTime" $ do
+    describe "formatUnixTime" $
         it "behaves like the model with utcTime0" $ do
             ans <- formatMailModel utcTime0
             formatUnixTime mailDateFormat unixTime0 `shouldBe` ans
 
-    describe "parseUnixTime" $ do
+{-
+    describe "parseUnixTime" $
         it "parses jst1970 properly" $
             parseUnixTime mailDateFormat jst1970 `shouldBe` unixTime0
+-}
 
-    describe "parseUnixTime & formatUnixTime" $ do
+    describe "parseUnixTimeGMT & formatUnixTimeGMT" $
         it "inverses the result" $ do
             ut@(UnixTime sec _) <- getUnixTime
-            let dt = formatUnixTime mailDateFormat ut
-                ut' = parseUnixTime mailDateFormat dt
+            let dt  = formatUnixTimeGMT webDateFormat ut
+                ut' = parseUnixTimeGMT  webDateFormat dt
+                dt' = formatUnixTimeGMT webDateFormat ut'
             ut' `shouldBe` UnixTime sec 0
+            dt `shouldBe` dt'
 
-    describe "addUnixDiffTime & diffUnixTime" $ do
+    describe "addUnixDiffTime & diffUnixTime" $
         it "invrses the result" $ do
             ut0 <- getUnixTime
             ut1 <- getUnixTime
@@ -59,5 +59,5 @@ formatMailModel :: UTCTime -> IO BS.ByteString
 formatMailModel ut = ans <$> getCurrentTimeZone
   where
    toZoneTime tz = utcToZonedTime tz ut
-   fmt = mailDateFormat'
+   fmt = BS.unpack mailDateFormat
    ans tz = BS.pack $ formatTime defaultTimeLocale fmt $ toZoneTime tz
