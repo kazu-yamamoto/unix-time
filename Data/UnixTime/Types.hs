@@ -5,7 +5,8 @@ import Data.ByteString.Char8 ()
 import Data.Int
 import Foreign.C.Types
 
--- | Data structure for Unix time.
+-- |
+-- Data structure for Unix time.
 data UnixTime = UnixTime {
   -- | Seconds from 1st Jan 1970
     utSeconds :: {-# UNPACK #-} !CTime
@@ -13,9 +14,17 @@ data UnixTime = UnixTime {
   , utMicroSeconds :: {-# UNPACK #-} !Int32
   } deriving (Eq,Ord,Show)
 
--- | Format of the strptime()/strftime() style.
+-- |
+-- Format of the strptime()/strftime() style.
 type Format = ByteString
 
--- | Data structure for UnixTime diff.
+-- |
+-- Data structure for UnixTime diff.
+--
+-- >>> (3 :: UnixDiffTime) + 2
+-- UnixDiffTime 5 0
+-- >>> (2 :: UnixDiffTime) - 5
+-- UnixDiffTime (-3) 0
+
 data UnixDiffTime = UnixDiffTime {-# UNPACK #-} !CTime
                                  {-# UNPACK #-} !Int32 deriving (Eq,Ord,Show)
