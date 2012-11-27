@@ -32,21 +32,25 @@ foreign import ccall unsafe "c_format_unix_time_gmt"
 
 ----------------------------------------------------------------
 
-{-| Parsing 'ByteString' to 'UnixTime' interpreting as localtime.
-    Zone in 'Format' (%Z or %z) would be ignored.
-    This is a wrapper for strptime_l().
--}
+-- |
+-- Parsing 'ByteString' to 'UnixTime' interpreting as localtime.
+-- Zone in 'Format' (%Z or %z) would be ignored.
+-- This is a wrapper for strptime_l().
+
 parseUnixTime :: Format -> ByteString -> UnixTime
 parseUnixTime fmt str = unsafePerformIO $
     useAsCString fmt $ \cfmt ->
         useAsCString str $ \cstr -> do
             sec <- c_parse_unix_time cfmt cstr
             return $ UnixTime sec 0
+-- |
+-- Parsing 'ByteString' to 'UnixTime' interpreting as GMT.
+-- Zone in 'Format' (%Z or %z) would be ignored.
+-- This is a wrapper for strptime_l().
+--
+-- >>> parseUnixTimeGMT webDateFormat "Thu, 01 Jan 1970 00:00:00 GMT"
+-- UnixTime 0 0
 
-{-| Parsing 'ByteString' to 'UnixTime' interpreting as GMT.
-    Zone in 'Format' (%Z or %z) would be ignored.
-    This is a wrapper for strptime_l().
--}
 parseUnixTimeGMT :: Format -> ByteString -> UnixTime
 parseUnixTimeGMT fmt str = unsafePerformIO $
     useAsCString fmt $ \cfmt ->
@@ -56,9 +60,10 @@ parseUnixTimeGMT fmt str = unsafePerformIO $
 
 ----------------------------------------------------------------
 
-{-| Formatting 'UnixTime' to 'ByteString' in local time.
-    This is a wrapper for strftime_l().
--}
+-- |
+-- Formatting 'UnixTime' to 'ByteString' in local time.
+-- This is a wrapper for strftime_l().
+
 formatUnixTime :: Format -> UnixTime -> ByteString
 formatUnixTime fmt (UnixTime sec _) = unsafePerformIO $
     useAsCString fmt $ \cfmt -> do
@@ -67,9 +72,13 @@ formatUnixTime fmt (UnixTime sec _) = unsafePerformIO $
         c_format_unix_time cfmt sec ptr (fromIntegral siz)
         unsafePackMallocCString ptr
 
-{-| Formatting 'UnixTime' to 'ByteString' in GMT.
-    This is a wrapper for strftime_l().
--}
+-- |
+-- Formatting 'UnixTime' to 'ByteString' in GMT.
+-- This is a wrapper for strftime_l().
+--
+-- >>> formatUnixTimeGMT webDateFormat $ UnixTime 0 0
+-- "Thu, 01 Jan 1970 00:00:00 GMT"
+
 formatUnixTimeGMT :: Format -> UnixTime -> ByteString
 formatUnixTimeGMT fmt (UnixTime sec _) = unsafePerformIO $
     useAsCString fmt $ \cfmt -> do
@@ -80,40 +89,48 @@ formatUnixTimeGMT fmt (UnixTime sec _) = unsafePerformIO $
 
 ----------------------------------------------------------------
 
-{-| Format for web (RFC 2616).
-    This should be used with 'formatUnixTimeGMT'.
--}
+-- |
+-- Format for web (RFC 2616).
+-- The value is \"%a, %d %b %Y %H:%M:%S GMT\".
+-- This should be used with 'formatUnixTimeGMT' and 'parseUnixTimeGMT'.
+
 webDateFormat :: Format
 webDateFormat = "%a, %d %b %Y %H:%M:%S GMT"
 
-{-| Format for e-mail (RFC 5322).
-    This should be used with 'formatUnixTime'.
--}
+-- |
+-- Format for e-mail (RFC 5322).
+-- The value is \"%a, %d %b %Y %H:%M:%S %z\".
+-- This should be used with 'formatUnixTime' and 'parseUnixTime'.
+
 mailDateFormat :: Format
 mailDateFormat = "%a, %d %b %Y %H:%M:%S %z"
 
 ----------------------------------------------------------------
 
-{-| From 'EpochTime' to 'UnixTime' setting 'utMicroSeconds' to 0.
--}
+-- |
+-- From 'EpochTime' to 'UnixTime' setting 'utMicroSeconds' to 0.
+
 fromEpochTime :: EpochTime -> UnixTime
 fromEpochTime sec = UnixTime sec 0
 
-{-| From 'UnixTime' to 'EpochTime' ignoring 'utMicroSeconds'.
--}
+-- |
+-- From 'UnixTime' to 'EpochTime' ignoring 'utMicroSeconds'.
+
 toEpochTime :: UnixTime -> EpochTime
 toEpochTime (UnixTime sec _) = sec
 
-{-| From 'ClockTime' to 'UnixTime'.
--}
+-- |
+-- From 'ClockTime' to 'UnixTime'.
+
 fromClockTime :: ClockTime -> UnixTime
 fromClockTime (TOD sec psec) = UnixTime sec' usec'
   where
     sec' = fromIntegral sec
     usec' = fromIntegral $ psec `div` 1000000
 
-{-| From 'UnixTime' to 'ClockTime'.
--}
+-- |
+-- From 'UnixTime' to 'ClockTime'.
+
 toClockTime :: UnixTime -> ClockTime
 toClockTime (UnixTime sec usec) = TOD sec' psec'
   where
