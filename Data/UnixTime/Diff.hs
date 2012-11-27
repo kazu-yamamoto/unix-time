@@ -75,6 +75,9 @@ secondsToUnixDiffTime sec = UnixDiffTime (fromIntegral sec) 0
 --
 -- >>> microSecondsToUnixDiffTime 12345678
 -- UnixDiffTime 12 345678
+--
+-- >>> microSecondsToUnixDiffTime (-12345678)
+-- UnixDiffTime (-12) (-345678)
 
 microSecondsToUnixDiffTime :: (Integral a) => a -> UnixDiffTime
 microSecondsToUnixDiffTime usec = calc (fromIntegral s) (fromIntegral u)
