@@ -31,7 +31,7 @@ Test-Suite doctests
   Ghc-Options:          -threaded
   Main-Is:              doctests.hs
   Build-Depends:        base
-                      , doctest >= 0.8
+                      , doctest >= 0.9.3
 
 Test-Suite spec
   Type:                 exitcode-stdio-1.0
