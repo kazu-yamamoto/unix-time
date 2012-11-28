@@ -16,7 +16,7 @@ import Test.QuickCheck
 
 instance Arbitrary UnixTime where
     arbitrary = do
-        a <- choose (0,4294967295) :: Gen Int
+        a <- choose (0,2147483647) :: Gen Int
         b <- choose (0,999999) :: Gen Int
         let ut = UnixTime {
                 utSeconds = fromIntegral a
