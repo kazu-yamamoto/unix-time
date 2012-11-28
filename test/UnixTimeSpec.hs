@@ -8,6 +8,7 @@ import qualified Data.ByteString.Char8 as BS
 import Data.Time
 import Data.Time.Clock.POSIX (posixSecondsToUTCTime)
 import Data.UnixTime
+import Data.Word
 import System.IO.Unsafe (unsafePerformIO)
 import System.Locale (defaultTimeLocale)
 import Test.Hspec
@@ -16,8 +17,8 @@ import Test.QuickCheck
 
 instance Arbitrary UnixTime where
     arbitrary = do
-        a <- choose (0,2147483647) :: Gen Int
-        b <- choose (0,999999) :: Gen Int
+        a <- choose (0,4294967295) :: Gen Word
+        b <- choose (0,999999) :: Gen Word
         let ut = UnixTime {
                 utSeconds = fromIntegral a
               , utMicroSeconds = fromIntegral b
