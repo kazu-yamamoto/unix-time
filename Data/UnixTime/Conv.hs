@@ -34,8 +34,9 @@ foreign import ccall unsafe "c_format_unix_time_gmt"
 
 -- |
 -- Parsing 'ByteString' to 'UnixTime' interpreting as localtime.
--- Zone in 'Format' (%Z or %z) would be ignored.
 -- This is a wrapper for strptime_l().
+-- Many implementations of strptime_l() do not support %Z and
+-- some implementations of strptime_l() do not support %z, either.
 
 parseUnixTime :: Format -> ByteString -> UnixTime
 parseUnixTime fmt str = unsafePerformIO $
@@ -45,7 +46,6 @@ parseUnixTime fmt str = unsafePerformIO $
             return $ UnixTime sec 0
 -- |
 -- Parsing 'ByteString' to 'UnixTime' interpreting as GMT.
--- Zone in 'Format' (%Z or %z) would be ignored.
 -- This is a wrapper for strptime_l().
 --
 -- >>> parseUnixTimeGMT webDateFormat "Thu, 01 Jan 1970 00:00:00 GMT"
