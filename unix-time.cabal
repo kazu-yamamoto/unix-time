@@ -28,7 +28,7 @@ Library
 Test-Suite doctests
   Type:                 exitcode-stdio-1.0
   HS-Source-Dirs:       test
-  Ghc-Options:          -threaded
+  Ghc-Options:          -threaded -Wall
   Main-Is:              doctests.hs
   Build-Depends:        base
                       , doctest >= 0.9.3
@@ -37,6 +37,7 @@ Test-Suite spec
   Type:                 exitcode-stdio-1.0
   Default-Language:     Haskell2010
   Hs-Source-Dirs:       test
+  Ghc-Options:          -Wall
   Main-Is:              Spec.hs
   Other-Modules:        UnixTimeSpec
   Build-Depends:        base
@@ -44,6 +45,7 @@ Test-Suite spec
                       , hspec
                       , old-locale
                       , old-time
+                      , QuickCheck
                       , time
                       , unix-time
 

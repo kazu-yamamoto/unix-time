@@ -1,63 +1,58 @@
-{-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE OverloadedStrings, FlexibleInstances #-}
+{-# OPTIONS_GHC -fno-warn-orphans #-}
 
 module UnixTimeSpec where
 
-import Control.Applicative
 import Data.ByteString (ByteString)
 import qualified Data.ByteString.Char8 as BS
 import Data.Time
+import Data.Time.Clock.POSIX (posixSecondsToUTCTime)
 import Data.UnixTime
-import System.Locale
+import System.IO.Unsafe (unsafePerformIO)
+import System.Locale (defaultTimeLocale)
 import Test.Hspec
+import Test.Hspec.QuickCheck (prop)
+import Test.QuickCheck
 
-utcTime0 :: UTCTime
-utcTime0 = UTCTime {
-    utctDay = ModifiedJulianDay 40587
-  , utctDayTime = secondsToDiffTime 0
-  }
+instance Arbitrary UnixTime where
+    arbitrary = do
+        a <- choose (0,4294967295) :: Gen Int
+        b <- choose (0,999999) :: Gen Int
+        let ut = UnixTime {
+                utSeconds = fromIntegral a
+              , utMicroSeconds = fromIntegral b
+              }
+        return ut
 
-unixTime0 :: UnixTime
-unixTime0 = UnixTime 0 0
-
-{- timezone cannot be parsed by some strptime_l().
-jst1970 :: ByteString
-jst1970 = "Thu, 01 Jan 1970 09:00:00 +0900"
--}
+currentTimeZone :: TimeZone
+currentTimeZone = unsafePerformIO getCurrentTimeZone
 
 spec :: Spec
 spec = do
     describe "formatUnixTime" $
-        it "behaves like the model with utcTime0" $ do
-            ans <- formatMailModel utcTime0
-            formatUnixTime mailDateFormat unixTime0 `shouldBe` ans
-
-{-
-    describe "parseUnixTime" $
-        it "parses jst1970 properly" $
-            parseUnixTime mailDateFormat jst1970 `shouldBe` unixTime0
--}
+        prop "behaves like the model" $ \ut ->
+            let ours = formatUnixTime mailDateFormat ut
+                model = formatMailModel (toUTCTime ut) currentTimeZone
+            in ours == model
 
     describe "parseUnixTimeGMT & formatUnixTimeGMT" $
-        it "inverses the result" $ do
-            ut@(UnixTime sec _) <- getUnixTime
+        prop "inverses the result" $ \ut@(UnixTime sec _) ->
             let dt  = formatUnixTimeGMT webDateFormat ut
                 ut' = parseUnixTimeGMT  webDateFormat dt
                 dt' = formatUnixTimeGMT webDateFormat ut'
-            ut' `shouldBe` UnixTime sec 0
-            dt `shouldBe` dt'
+            in ut' == UnixTime sec 0 && dt == dt'
 
     describe "addUnixDiffTime & diffUnixTime" $
-        it "invrses the result" $ do
-            ut0 <- getUnixTime
-            ut1 <- getUnixTime
+        prop "invrses the result" $ \(ut0, ut1) ->
             let ut0' = addUnixDiffTime ut1 $ diffUnixTime ut0 ut1
                 ut1' = addUnixDiffTime ut0 $ diffUnixTime ut1 ut0
-            ut0' `shouldBe` ut0
-            ut1' `shouldBe` ut1
+            in ut0' == ut0 && ut1' == ut1
 
-formatMailModel :: UTCTime -> IO BS.ByteString
-formatMailModel ut = ans <$> getCurrentTimeZone
+formatMailModel :: UTCTime -> TimeZone -> ByteString
+formatMailModel ut zone = BS.pack $ formatTime defaultTimeLocale fmt zt
   where
-   toZoneTime tz = utcToZonedTime tz ut
+   zt = utcToZonedTime zone ut
    fmt = BS.unpack mailDateFormat
-   ans tz = BS.pack $ formatTime defaultTimeLocale fmt $ toZoneTime tz
+
+toUTCTime :: UnixTime -> UTCTime
+toUTCTime = posixSecondsToUTCTime . realToFrac . toEpochTime
