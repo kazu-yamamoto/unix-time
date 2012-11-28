@@ -8,7 +8,6 @@ import qualified Data.ByteString.Char8 as BS
 import Data.Time
 import Data.Time.Clock.POSIX (posixSecondsToUTCTime)
 import Data.UnixTime
-import Data.Word
 import System.IO.Unsafe (unsafePerformIO)
 import System.Locale (defaultTimeLocale)
 import Test.Hspec
