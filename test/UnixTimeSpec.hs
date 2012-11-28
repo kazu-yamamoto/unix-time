@@ -20,7 +20,7 @@ instance Arbitrary UnixTime where
         a <- choose (0,4294967295) :: Gen Word
         b <- choose (0,999999) :: Gen Word
         let ut = UnixTime {
-                utSeconds = fromIntegral a
+                utSeconds = abs (fromIntegral a)
               , utMicroSeconds = fromIntegral b
               }
         return ut
