@@ -25,8 +25,9 @@ Library
                       , old-time
   C-Sources:            cbits/conv.c
 
-Test-Suite doctests
+Test-Suite doctest
   Type:                 exitcode-stdio-1.0
+  Default-Language:     Haskell2010
   HS-Source-Dirs:       test
   Ghc-Options:          -threaded -Wall
   Main-Is:              doctests.hs
