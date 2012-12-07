@@ -8,6 +8,7 @@ import qualified Data.ByteString.Char8 as BS
 import Data.Time
 import Data.Time.Clock.POSIX (posixSecondsToUTCTime)
 import Data.UnixTime
+import System.IO.Unsafe (unsafePerformIO)
 import System.Locale (defaultTimeLocale)
 import Test.Hspec
 import Test.Hspec.QuickCheck (prop)
@@ -23,14 +24,16 @@ instance Arbitrary UnixTime where
               }
         return ut
 
+currentTimeZone :: TimeZone
+currentTimeZone = unsafePerformIO getCurrentTimeZone
+
 spec :: Spec
 spec = do
     describe "formatUnixTime" $
-        prop "behaves like the model" $ \ut -> example $ do
-            currentTimeZone <- getCurrentTimeZone
+        prop "behaves like the model" $ \ut ->
             let ours = formatUnixTime mailDateFormat ut
                 model = formatMailModel (toUTCTime ut) currentTimeZone
-            ours `shouldBe` model
+            in ours == model
 
     describe "parseUnixTimeGMT & formatUnixTimeGMT" $
         prop "inverses the result" $ \ut@(UnixTime sec _) ->
