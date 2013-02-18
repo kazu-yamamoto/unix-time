@@ -11,6 +11,7 @@
 #define THREAD_SAFE 0
 #endif
 
+#include <string.h>
 #include <time.h>
 #include <locale.h>
 
@@ -35,6 +36,7 @@ void init_locale() {
 time_t c_parse_unix_time(char *fmt, char *src) {
     struct tm dst;
     init_locale();
+    memset(&dst, 0, sizeof(struct tm));
 #if THREAD_SAFE
     strptime_l(src, fmt, &dst, c_locale);
 #else
@@ -46,6 +48,7 @@ time_t c_parse_unix_time(char *fmt, char *src) {
 time_t c_parse_unix_time_gmt(char *fmt, char *src) {
     struct tm dst;
     init_locale();
+    memset(&dst, 0, sizeof(struct tm));
 #if THREAD_SAFE
     strptime_l(src, fmt, &dst, c_locale);
 #else
