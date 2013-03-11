@@ -8,7 +8,7 @@ module Data.UnixTime (
   , parseUnixTimeGMT
   , formatUnixTime
   , formatUnixTimeGMT
-  -- * Fromat
+  -- * Format
   , Format
   , webDateFormat
   , mailDateFormat
