@@ -43,7 +43,7 @@ Test-Suite spec
   Other-Modules:        UnixTimeSpec
   Build-Depends:        base
                       , bytestring
-                      , hspec
+                      , hspec >= 1.5
                       , old-locale
                       , old-time
                       , QuickCheck
