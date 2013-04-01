@@ -33,7 +33,8 @@ spec = do
             let ours = formatUnixTime mailDateFormat ut
                 utcTime = toUTCTime ut
             timeZone <- getTimeZone utcTime
-            ours `shouldBe` formatMailModel utcTime timeZone
+            let model = formatMailModel utcTime timeZone
+            ours `shouldBe` model
 
     describe "parseUnixTimeGMT & formatUnixTimeGMT" $
         prop "inverses the result" $ \ut@(UnixTime sec _) ->
