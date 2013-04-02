@@ -7,7 +7,7 @@ License-File:           LICENSE
 Synopsis:               Unix time parser/formatter and utilities
 Description:            Fast parser\/formatter\/utilities for Unix time
 Category:               Data
-Cabal-Version:          >= 1.8
+Cabal-Version:          >= 1.10
 Build-Type:             Configure
 Extra-Source-Files:     cbits/conv.c cbits/config.h.in configure configure.ac
 Extra-Tmp-Files:        config.log config.status autom4te.cache cbits/config.h
