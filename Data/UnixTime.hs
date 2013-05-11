@@ -13,7 +13,7 @@ module Data.UnixTime (
   , webDateFormat
   , mailDateFormat
   -- * Difference time
-  , UnixDiffTime
+  , UnixDiffTime(..)
   , diffUnixTime
   , addUnixDiffTime
   , secondsToUnixDiffTime
