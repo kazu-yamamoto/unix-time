@@ -8,9 +8,9 @@ import Foreign.C.Types
 -- |
 -- Data structure for Unix time.
 data UnixTime = UnixTime {
-  -- | Seconds from 1st Jan 1970
+    -- | Seconds from 1st Jan 1970
     utSeconds :: {-# UNPACK #-} !CTime
-  -- | Micro seconds (i.e. 10^(-6))
+    -- | Micro seconds (i.e. 10^(-6))
   , utMicroSeconds :: {-# UNPACK #-} !Int32
   } deriving (Eq,Ord,Show)
 
@@ -28,5 +28,9 @@ type Format = ByteString
 -- >>> (3 :: UnixDiffTime) * 2
 -- UnixDiffTime 6 0
 
-data UnixDiffTime = UnixDiffTime {-# UNPACK #-} !CTime
-                                 {-# UNPACK #-} !Int32 deriving (Eq,Ord,Show)
+data UnixDiffTime = UnixDiffTime {
+    -- | Seconds from 1st Jan 1970
+    udtSeconds :: {-# UNPACK #-} !CTime
+    -- | Micro seconds (i.e. 10^(-6))
+  , udtMicroSecnods :: {-# UNPACK #-} !Int32
+  } deriving (Eq,Ord,Show)
