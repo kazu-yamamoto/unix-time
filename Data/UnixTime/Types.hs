@@ -22,11 +22,11 @@ type Format = ByteString
 -- Data structure for UnixTime diff.
 --
 -- >>> (3 :: UnixDiffTime) + 2
--- UnixDiffTime 5 0
+-- UnixDiffTime {udtSeconds = 5, udtMicroSecnods = 0}
 -- >>> (2 :: UnixDiffTime) - 5
--- UnixDiffTime (-3) 0
+-- UnixDiffTime {udtSeconds = -3, udtMicroSecnods = 0}
 -- >>> (3 :: UnixDiffTime) * 2
--- UnixDiffTime 6 0
+-- UnixDiffTime {udtSeconds = 6, udtMicroSecnods = 0}
 
 data UnixDiffTime = UnixDiffTime {
     -- | Seconds from 1st Jan 1970

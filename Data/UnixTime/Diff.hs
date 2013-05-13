@@ -48,7 +48,7 @@ instance Real UnixDiffTime where
 -- | Calculating difference between two 'UnixTime'.
 --
 -- >>> UnixTime 100 2000 `diffUnixTime` UnixTime 98 2100
--- UnixDiffTime 1 999900
+-- UnixDiffTime {udtSeconds = 1, udtMicroSecnods = 999900}
 --
 
 diffUnixTime :: UnixTime -> UnixTime -> UnixDiffTime
@@ -65,7 +65,7 @@ addUnixDiffTime (UnixTime s1 u1) (UnixDiffTime s2 u2) = calcU (s1+s2) (u1+u2)
 -- | Creating difference from seconds.
 --
 -- >>> secondsToUnixDiffTime 100
--- UnixDiffTime 100 0
+-- UnixDiffTime {udtSeconds = 100, udtMicroSecnods = 0}
 
 secondsToUnixDiffTime :: (Integral a) => a -> UnixDiffTime
 secondsToUnixDiffTime sec = UnixDiffTime (fromIntegral sec) 0
@@ -74,10 +74,10 @@ secondsToUnixDiffTime sec = UnixDiffTime (fromIntegral sec) 0
 -- | Creating difference from micro seconds.
 --
 -- >>> microSecondsToUnixDiffTime 12345678
--- UnixDiffTime 12 345678
+-- UnixDiffTime {udtSeconds = 12, udtMicroSecnods = 345678}
 --
 -- >>> microSecondsToUnixDiffTime (-12345678)
--- UnixDiffTime (-12) (-345678)
+-- UnixDiffTime {udtSeconds = -12, udtMicroSecnods = -345678}
 
 microSecondsToUnixDiffTime :: (Integral a) => a -> UnixDiffTime
 microSecondsToUnixDiffTime usec = calc (fromIntegral s) (fromIntegral u)
