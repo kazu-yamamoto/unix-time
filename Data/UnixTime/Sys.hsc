@@ -18,7 +18,7 @@ type CTimeVal = ()
 type CTimeZone = ()
 
 foreign import ccall unsafe "gettimeofday"
-    gettimeofday :: Ptr CTimeVal -> Ptr CTimeZone -> IO CInt
+    c_gettimeofday :: Ptr CTimeVal -> Ptr CTimeZone -> IO CInt
 
 -- |
 -- Getting 'UnixTime' from OS.
@@ -26,7 +26,7 @@ foreign import ccall unsafe "gettimeofday"
 getUnixTime :: IO UnixTime
 getUnixTime =
   allocaBytes (#const sizeof(struct timeval)) $ \ p_timeval -> do
-    throwErrnoIfMinus1_ "getClockTime" $ gettimeofday p_timeval nullPtr
+    throwErrnoIfMinus1_ "getClockTime" $ c_gettimeofday p_timeval nullPtr
     sec <- (#peek struct timeval,tv_sec) p_timeval
     usec <- (#peek struct timeval,tv_usec) p_timeval
     return $ UnixTime sec usec
