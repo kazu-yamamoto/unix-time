@@ -7,6 +7,7 @@
 #define _BSD_SOURCE
 #elif HAVE_STRPTIME_L
 #define THREAD_SAFE 1
+#define _GNU_SOURCE
 #else
 #define THREAD_SAFE 0
 #endif
