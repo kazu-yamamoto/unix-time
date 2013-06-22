@@ -7,6 +7,7 @@
 #define _BSD_SOURCE
 #elif HAVE_STRPTIME_L
 #define THREAD_SAFE 1
+#define _GNU_SOURCE
 #else
 #define THREAD_SAFE 0
 #endif
@@ -21,7 +22,7 @@
 locale_t c_locale = NULL;
 
 void init_locale() {
-    if (c_locale == NULL) c_locale = newlocale(LC_TIME_MASK, NULL, NULL);
+    if (c_locale == NULL) c_locale = newlocale(LC_TIME_MASK, "C", NULL);
 }
 #else
 void init_locale() {
