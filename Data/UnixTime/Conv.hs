@@ -65,9 +65,9 @@ parseUnixTimeGMT fmt str = unsafePerformIO $
 -- Formatting 'UnixTime' to 'ByteString' in local time.
 -- This is a wrapper for strftime_l().
 
-formatUnixTime :: Format -> UnixTime -> ByteString
+formatUnixTime :: Format -> UnixTime -> IO ByteString
 formatUnixTime fmt t =
-    unsafePerformIO $ formatUnixTimeHelper c_format_unix_time fmt t
+    formatUnixTimeHelper c_format_unix_time fmt t
 {-# INLINE formatUnixTime #-}
 
 -- |
