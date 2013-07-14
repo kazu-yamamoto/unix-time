@@ -8,6 +8,7 @@ module Data.UnixTime.Conv (
   , fromClockTime, toClockTime
   ) where
 
+import Control.Monad (liftM)
 import Data.ByteString
 import Data.ByteString.Unsafe
 import Data.UnixTime.Types
@@ -65,12 +66,9 @@ parseUnixTimeGMT fmt str = unsafePerformIO $
 -- This is a wrapper for strftime_l().
 
 formatUnixTime :: Format -> UnixTime -> ByteString
-formatUnixTime fmt (UnixTime sec _) = unsafePerformIO $
-    useAsCString fmt $ \cfmt -> do
-        let siz = 256 -- FIXME
-        ptr <- mallocBytes siz
-        c_format_unix_time cfmt sec ptr (fromIntegral siz)
-        unsafePackMallocCString ptr
+formatUnixTime fmt t =
+    unsafePerformIO $ formatUnixTimeHelper c_format_unix_time fmt t
+{-# INLINE formatUnixTime #-}
 
 -- |
 -- Formatting 'UnixTime' to 'ByteString' in GMT.
@@ -80,12 +78,25 @@ formatUnixTime fmt (UnixTime sec _) = unsafePerformIO $
 -- "Thu, 01 Jan 1970 00:00:00 GMT"
 
 formatUnixTimeGMT :: Format -> UnixTime -> ByteString
-formatUnixTimeGMT fmt (UnixTime sec _) = unsafePerformIO $
+formatUnixTimeGMT fmt t =
+    unsafePerformIO $ formatUnixTimeHelper c_format_unix_time_gmt fmt t
+{-# INLINE formatUnixTimeGMT #-}
+
+-- |
+-- Helper handling memory allocation for formatUnixTime and formatUnixTimeGMT.
+
+formatUnixTimeHelper
+    :: (CString -> CTime -> CString -> CInt -> IO CSize)
+    -> Format
+    -> UnixTime
+    -> IO ByteString
+formatUnixTimeHelper formatFun fmt (UnixTime sec _) =
     useAsCString fmt $ \cfmt -> do
-        let siz = 256 -- FIXME
-        ptr <- mallocBytes siz
-        c_format_unix_time_gmt cfmt sec ptr (fromIntegral siz)
-        unsafePackMallocCString ptr
+        let siz = 80
+        ptr  <- mallocBytes siz
+        len  <- liftM fromIntegral (formatFun cfmt sec ptr (fromIntegral siz))
+        ptr' <- reallocBytes ptr len
+        unsafePackMallocCString ptr' -- FIXME: Use unsafePackMallocCStringLen from bytestring-0.10.2.0
 
 ----------------------------------------------------------------
 
