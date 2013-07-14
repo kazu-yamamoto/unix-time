@@ -25,10 +25,10 @@ foreign import ccall unsafe "c_parse_unix_time_gmt"
         c_parse_unix_time_gmt :: CString -> CString -> IO CTime
 
 foreign import ccall unsafe "c_format_unix_time"
-        c_format_unix_time :: CString -> CTime -> CString -> CInt -> IO ()
+        c_format_unix_time :: CString -> CTime -> CString -> CInt -> IO CSize
 
 foreign import ccall unsafe "c_format_unix_time_gmt"
-        c_format_unix_time_gmt :: CString -> CTime -> CString -> CInt -> IO ()
+        c_format_unix_time_gmt :: CString -> CTime -> CString -> CInt -> IO CSize
 
 ----------------------------------------------------------------
 
