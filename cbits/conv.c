@@ -58,24 +58,24 @@ time_t c_parse_unix_time_gmt(char *fmt, char *src) {
     return timegm(&dst);
 }
 
-void c_format_unix_time(char *fmt, time_t src, char* dst, int siz) {
+size_t c_format_unix_time(char *fmt, time_t src, char* dst, int siz) {
     struct tm tim;
     init_locale();
     localtime_r(&src, &tim);
 #if THREAD_SAFE
-    strftime_l(dst, siz, fmt, &tim, c_locale);
+    return strftime_l(dst, siz, fmt, &tim, c_locale);
 #else
-    strftime(dst, siz, fmt, &tim);
+    return strftime(dst, siz, fmt, &tim);
 #endif
 }
 
-void c_format_unix_time_gmt(char *fmt, time_t src, char* dst, int siz) {
+size_t c_format_unix_time_gmt(char *fmt, time_t src, char* dst, int siz) {
     struct tm tim;
     init_locale();
     gmtime_r(&src, &tim);
 #if THREAD_SAFE
-    strftime_l(dst, siz, fmt, &tim, c_locale);
+    return strftime_l(dst, siz, fmt, &tim, c_locale);
 #else
-    strftime(dst, siz, fmt, &tim);
+    return strftime(dst, siz, fmt, &tim);
 #endif
 }
