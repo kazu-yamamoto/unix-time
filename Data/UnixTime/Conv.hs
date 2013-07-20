@@ -95,7 +95,7 @@ formatUnixTimeHelper formatFun fmt (UnixTime sec _) =
         let siz = 80
         ptr  <- mallocBytes siz
         len  <- liftM fromIntegral (formatFun cfmt sec ptr (fromIntegral siz))
-        ptr' <- reallocBytes ptr len
+        ptr' <- reallocBytes ptr (len + 1)
         unsafePackMallocCString ptr' -- FIXME: Use unsafePackMallocCStringLen from bytestring-0.10.2.0
 
 ----------------------------------------------------------------
