@@ -8,7 +8,7 @@ module Data.UnixTime.Conv (
   , fromClockTime, toClockTime
   ) where
 
-import Control.Monad (liftM)
+import Control.Applicative
 import Data.ByteString
 import Data.ByteString.Unsafe
 import Data.UnixTime.Types
@@ -94,7 +94,7 @@ formatUnixTimeHelper formatFun fmt (UnixTime sec _) =
     useAsCString fmt $ \cfmt -> do
         let siz = 80
         ptr  <- mallocBytes siz
-        len  <- liftM fromIntegral (formatFun cfmt sec ptr (fromIntegral siz))
+        len  <- fromIntegral <$> formatFun cfmt sec ptr (fromIntegral siz)
         ptr' <- reallocBytes ptr (len + 1)
         unsafePackMallocCString ptr' -- FIXME: Use unsafePackMallocCStringLen from bytestring-0.10.2.0
 
