@@ -8,6 +8,9 @@ import qualified Data.ByteString.Char8 as BS
 import Data.Time
 import Data.Time.Clock.POSIX (posixSecondsToUTCTime)
 import Data.UnixTime
+import Foreign.Ptr (Ptr)
+import Foreign.Marshal.Alloc (alloca)
+import Foreign.Storable (peek, poke)
 import System.Locale (defaultTimeLocale)
 import Test.Hspec
 import Test.Hspec.QuickCheck (prop)
@@ -48,6 +51,12 @@ spec = do
             let ut0' = addUnixDiffTime ut1 $ diffUnixTime ut0 ut1
                 ut1' = addUnixDiffTime ut0 $ diffUnixTime ut1 ut0
             in ut0' == ut0 && ut1' == ut1
+
+    describe "UnixTime Storable instance" $
+        prop "peek . poke = id" $ \ut ->
+            let pokePeek :: Ptr UnixTime -> IO UnixTime
+                pokePeek ptr = poke ptr ut >> peek ptr
+            in shouldReturn (alloca pokePeek) ut
 
 formatMailModel :: UTCTime -> TimeZone -> ByteString
 formatMailModel ut zone = BS.pack $ formatTime defaultTimeLocale fmt zt
