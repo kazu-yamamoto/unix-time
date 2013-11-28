@@ -2,6 +2,7 @@
 #define __CONFIG_H__
 
 #undef HAVE_STRPTIME_L
+#undef HAVE_TIMEGM
 
 #undef IS_LINUX
 
