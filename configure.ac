@@ -17,7 +17,5 @@ case $host in
 	;;
 esac
 
-AC_DEFINE_UNQUOTED(IS_LINUX,$LINUX)
+AC_DEFINE_UNQUOTED(IS_LINUX,$LINUX,"Is Linux")
 AC_OUTPUT
-
-
