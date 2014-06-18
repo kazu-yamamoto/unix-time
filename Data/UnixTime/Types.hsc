@@ -6,6 +6,7 @@ import Data.ByteString.Char8 ()
 import Data.Int
 import Foreign.C.Types
 import Foreign.Storable
+import Data.Binary
 
 #include <sys/time.h>
 
@@ -29,6 +30,12 @@ instance Storable UnixTime where
     poke ptr ut = do
             (#poke struct timeval, tv_sec)  ptr (utSeconds ut)
             (#poke struct timeval, tv_usec) ptr (utMicroSeconds ut)
+
+instance Binary UnixTime where
+        put (UnixTime (CTime sec) msec) = do
+            put sec
+            put msec
+        get = UnixTime <$> (CTime `fmap` get) <*> get
 
 -- |
 -- Format of the strptime()/strftime() style.
