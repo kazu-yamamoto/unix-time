@@ -23,6 +23,7 @@ Library
   Build-Depends:        base >= 4 && < 5
                       , bytestring
                       , old-time
+                      , binary
   C-Sources:            cbits/conv.c
 
 Test-Suite doctest
