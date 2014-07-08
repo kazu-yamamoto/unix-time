@@ -6,7 +6,9 @@ import Data.ByteString.Char8 ()
 import Data.Int
 import Foreign.C.Types
 import Foreign.Storable
+#if __GLASGOW_HASKELL__ >= 704
 import Data.Binary
+#endif
 
 #include <sys/time.h>
 
@@ -31,11 +33,13 @@ instance Storable UnixTime where
             (#poke struct timeval, tv_sec)  ptr (utSeconds ut)
             (#poke struct timeval, tv_usec) ptr (utMicroSeconds ut)
 
+#if __GLASGOW_HASKELL__ >= 704
 instance Binary UnixTime where
         put (UnixTime (CTime sec) msec) = do
             put sec
             put msec
         get = UnixTime <$> (CTime `fmap` get) <*> get
+#endif
 
 -- |
 -- Format of the strptime()/strftime() style.
