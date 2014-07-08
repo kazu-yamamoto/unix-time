@@ -15,6 +15,7 @@ Extra-Tmp-Files:        config.log config.status autom4te.cache cbits/config.h
 Library
   Default-Language:     Haskell2010
   GHC-Options:          -Wall
+  CC-Options:           -fPIC
   Exposed-Modules:      Data.UnixTime
   Other-Modules:        Data.UnixTime.Conv
                         Data.UnixTime.Diff
