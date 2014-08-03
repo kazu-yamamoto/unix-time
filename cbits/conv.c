@@ -17,7 +17,9 @@
 #include <locale.h>
 
 #if THREAD_SAFE
+#if HAVE_XLOCALE_H
 #include <xlocale.h>
+#endif
 
 locale_t c_locale = NULL;
 

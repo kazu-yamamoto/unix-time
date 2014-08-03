@@ -4,6 +4,8 @@ AC_DISABLE_OPTION_CHECKING
 
 AC_CONFIG_HEADER(cbits/config.h)
 
+AC_CHECK_HEADERS(xlocale.h)
+
 AC_CHECK_FUNCS(strptime_l)
 AC_CHECK_FUNCS(timegm)
 
