@@ -49,15 +49,15 @@ type Format = ByteString
 -- Data structure for UnixTime diff.
 --
 -- >>> (3 :: UnixDiffTime) + 2
--- UnixDiffTime {udtSeconds = 5, udtMicroSecnods = 0}
+-- UnixDiffTime {udtSeconds = 5, udtMicroSeconds = 0}
 -- >>> (2 :: UnixDiffTime) - 5
--- UnixDiffTime {udtSeconds = -3, udtMicroSecnods = 0}
+-- UnixDiffTime {udtSeconds = -3, udtMicroSeconds = 0}
 -- >>> (3 :: UnixDiffTime) * 2
--- UnixDiffTime {udtSeconds = 6, udtMicroSecnods = 0}
+-- UnixDiffTime {udtSeconds = 6, udtMicroSeconds = 0}
 
 data UnixDiffTime = UnixDiffTime {
     -- | Seconds from 1st Jan 1970
     udtSeconds :: {-# UNPACK #-} !CTime
     -- | Micro seconds (i.e. 10^(-6))
-  , udtMicroSecnods :: {-# UNPACK #-} !Int32
+  , udtMicroSeconds :: {-# UNPACK #-} !Int32
   } deriving (Eq,Ord,Show)
