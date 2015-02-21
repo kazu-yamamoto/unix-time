@@ -1,4 +1,4 @@
-{-# LANGUAGE OverloadedStrings, FlexibleInstances #-}
+{-# LANGUAGE OverloadedStrings, FlexibleInstances, CPP #-}
 {-# OPTIONS_GHC -fno-warn-orphans #-}
 
 module UnixTimeSpec (main, spec) where
@@ -11,10 +11,13 @@ import Data.UnixTime
 import Foreign.Ptr (Ptr)
 import Foreign.Marshal.Alloc (alloca)
 import Foreign.Storable (peek, poke)
-import System.Locale (defaultTimeLocale)
 import Test.Hspec
 import Test.Hspec.QuickCheck (prop)
 import Test.QuickCheck
+
+#if !MIN_VERSION_time(1,5,0)
+import System.Locale (defaultTimeLocale)
+#endif
 
 main :: IO ()
 main = hspec spec
