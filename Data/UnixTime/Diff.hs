@@ -23,6 +23,13 @@ calcU :: CTime -> Int32 -> UnixTime
 calcU sec usec = uncurry UnixTime . adjust sec $ usec
 
 -- | Arithmetic operations where (1::UnixDiffTime) means 1 second.
+--
+-- >>> (3 :: UnixDiffTime) + 2
+-- UnixDiffTime {udtSeconds = 5, udtMicroSeconds = 0}
+-- >>> (2 :: UnixDiffTime) - 5
+-- UnixDiffTime {udtSeconds = -3, udtMicroSeconds = 0}
+-- >>> (3 :: UnixDiffTime) * 2
+-- UnixDiffTime {udtSeconds = 6, udtMicroSeconds = 0}
 
 instance Num UnixDiffTime where
     UnixDiffTime s1 u1 + UnixDiffTime s2 u2 = calc (s1+s2) (u1+u2)
