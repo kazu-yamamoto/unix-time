@@ -12,8 +12,6 @@ import Data.Binary
 
 #include <sys/time.h>
 
-#let alignment t = "%lu", (unsigned long)offsetof(struct {char x__; t (y__); }, y__)
-
 -- |
 -- Data structure for Unix time.
 --
@@ -35,7 +33,7 @@ data UnixTime = UnixTime {
 
 instance Storable UnixTime where
     sizeOf _    = (#size struct timeval)
-    alignment _ = (#alignment struct timeval)
+    alignment _ = (#const offsetof(struct {char x__; struct timeval (y__); }, y__))
     peek ptr    = UnixTime
             <$> (#peek struct timeval, tv_sec)  ptr
             <*> (#peek struct timeval, tv_usec) ptr
