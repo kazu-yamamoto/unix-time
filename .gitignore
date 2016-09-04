@@ -2,3 +2,5 @@ dist
 cbits/config.h
 config.log
 config.status
+.cabal-sandbox/
+cabal.sandbox.config
