@@ -53,7 +53,7 @@ char *set_tz_utc() {
  * Set the value of the TZ environment variable to tz or
  * unset the variable if tz is null;
  */
-void *set_tz(char *local_tz) {
+void set_tz(char *local_tz) {
     if (local_tz) {
       setenv("TZ", local_tz, 1);
     } else {
