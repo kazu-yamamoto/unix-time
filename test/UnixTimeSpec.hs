@@ -5,6 +5,7 @@ module UnixTimeSpec (main, spec) where
 
 import Data.ByteString (ByteString)
 import qualified Data.ByteString.Char8 as BS
+import Data.Function (on)
 import Data.Time
 import Data.Time.Clock.POSIX (posixSecondsToUTCTime)
 import Data.UnixTime
@@ -51,7 +52,7 @@ spec = do
         prop "inverses the result (2)" $ \ut ->
             let str = formatUnixTimeGMT "%s" ut
                 ut' = parseUnixTimeGMT "%s" str
-            in ut == ut'
+            in ((==) `on` utSeconds) ut ut'
 
     describe "addUnixDiffTime & diffUnixTime" $
         prop "invrses the result" $ \(ut0, ut1) ->
