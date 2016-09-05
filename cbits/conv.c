@@ -40,7 +40,7 @@ void init_locale() {
 /*
  * Set the value of the TZ environment variable to UTC
  * and return the old value.
- */ 
+ */
 char *set_tz_utc() {
     char *tz;
     tz = getenv("TZ");
@@ -49,7 +49,7 @@ char *set_tz_utc() {
     return tz;
 }
 
-/* 
+/*
  * Set the value of the TZ environment variable to tz or
  * unset the variable if tz is null;
  */
@@ -80,7 +80,7 @@ time_t c_parse_unix_time(char *fmt, char *src) {
  *
  * Copyright (c) 1997 Kungliga Tekniska H.gskolan
  * (Royal Institute of Technology, Stockholm, Sweden).
- * All rights reserved. 
+ * All rights reserved.
  */
 
 static int
@@ -120,7 +120,7 @@ time_t c_parse_unix_time_gmt(char *fmt, char *src) {
     char *local_tz;
     init_locale();
     memset(&dst, 0, sizeof(struct tm));
-    local_tz = set_tz_utc(); 
+    local_tz = set_tz_utc();
 #if THREAD_SAFE
     strptime_l(src, fmt, &dst, c_locale);
 #else
