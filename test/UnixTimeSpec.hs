@@ -42,12 +42,16 @@ spec = do
             let model = formatMailModel utcTime timeZone
             ours `shouldReturn` model
 
-    describe "parseUnixTimeGMT & formatUnixTimeGMT" $
+    describe "parseUnixTimeGMT & formatUnixTimeGMT" $ do
         prop "inverses the result" $ \ut@(UnixTime sec _) ->
             let dt  = formatUnixTimeGMT webDateFormat ut
                 ut' = parseUnixTimeGMT  webDateFormat dt
                 dt' = formatUnixTimeGMT webDateFormat ut'
             in ut' == UnixTime sec 0 && dt == dt'
+        prop "inverses the result (2)" $ \ut ->
+            let str = formatUnixTimeGMT "%s" ut
+                ut' = parseUnixTimeGMT "%s" str
+            in ut == ut'
 
     describe "addUnixDiffTime & diffUnixTime" $
         prop "invrses the result" $ \(ut0, ut1) ->
