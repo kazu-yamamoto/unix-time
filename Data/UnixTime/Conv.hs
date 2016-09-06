@@ -42,14 +42,6 @@ foreign import ccall unsafe "c_format_unix_time_gmt"
 -- Many implementations of strptime_l() do not support %Z and
 -- some implementations of strptime_l() do not support %z, either.
 -- 'utMicroSeconds' is always set to 0.
---
--- >>> let ut = UnixTime 100 200
--- >>> str <- formatUnixTime "%s" ut
--- >>> let ut' = parseUnixTime "%s" str
--- >>> ((==) `on` utSeconds) ut ut'
--- True
--- >>> ((==) `on` utMicroSeconds) ut ut'
--- False
 
 parseUnixTime :: Format -> ByteString -> UnixTime
 parseUnixTime fmt str = unsafePerformIO $
@@ -92,6 +84,13 @@ formatUnixTime fmt t =
 --
 -- >>> formatUnixTimeGMT webDateFormat $ UnixTime 0 0
 -- "Thu, 01 Jan 1970 00:00:00 GMT"
+-- >>> let ut = UnixTime 100 200
+-- >>> let str = formatUnixTimeGMT "%s" ut
+-- >>> let ut' = parseUnixTimeGMT "%s" str
+-- >>> ((==) `on` utSeconds) ut ut'
+-- True
+-- >>> ((==) `on` utMicroSeconds) ut ut'
+-- False
 
 formatUnixTimeGMT :: Format -> UnixTime -> ByteString
 formatUnixTimeGMT fmt t =
