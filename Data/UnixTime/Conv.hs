@@ -44,8 +44,8 @@ foreign import ccall unsafe "c_format_unix_time_gmt"
 -- 'utMicroSeconds' is always set to 0.
 --
 -- >>> let ut = UnixTime 100 200
--- >>> let str = formatUnixTimeGMT "%s" ut
--- >>> let ut' = parseUnixTimeGMT "%s" str
+-- >>> str <- formatUnixTime "%s" ut
+-- >>> let ut' = parseUnixTime "%s" str
 -- >>> ((==) `on` utSeconds) ut ut'
 -- True
 -- >>> ((==) `on` utMicroSeconds) ut ut'
