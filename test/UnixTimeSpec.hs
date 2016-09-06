@@ -14,7 +14,7 @@ import Foreign.Marshal.Alloc (alloca)
 import Foreign.Storable (peek, poke)
 import Test.Hspec
 import Test.Hspec.QuickCheck (prop)
-import Test.QuickCheck
+import Test.QuickCheck hiding ((===))
 
 #if !MIN_VERSION_time(1,5,0)
 import System.Locale (defaultTimeLocale)
@@ -44,15 +44,16 @@ spec = do
             ours `shouldReturn` model
 
     describe "parseUnixTimeGMT & formatUnixTimeGMT" $ do
-        prop "inverses the result" $ \ut@(UnixTime sec _) ->
+        let (===) = (==) `on` utSeconds
+        prop "inverses the result" $ \ut ->
             let dt  = formatUnixTimeGMT webDateFormat ut
                 ut' = parseUnixTimeGMT  webDateFormat dt
                 dt' = formatUnixTimeGMT webDateFormat ut'
-            in ut' == UnixTime sec 0 && dt == dt'
+            in ut === ut' && dt == dt'
         prop "inverses the result (2)" $ \ut ->
             let str = formatUnixTimeGMT "%s" ut
                 ut' = parseUnixTimeGMT "%s" str
-            in ((==) `on` utSeconds) ut ut'
+            in ut === ut'
 
     describe "addUnixDiffTime & diffUnixTime" $
         prop "invrses the result" $ \(ut0, ut1) ->
