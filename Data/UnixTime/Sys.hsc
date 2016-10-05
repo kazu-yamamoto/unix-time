@@ -21,7 +21,7 @@ foreign import ccall unsafe "gettimeofday"
     c_gettimeofday :: Ptr CTimeVal -> Ptr CTimeZone -> IO CInt
 
 -- |
--- Getting 'UnixTime' from OS.
+-- Get current 'UnixTime' from OS.
 
 getUnixTime :: IO UnixTime
 getUnixTime = allocaBytes (#const sizeof(struct timeval)) $ \ p_timeval -> do
