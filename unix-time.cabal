@@ -27,6 +27,7 @@ Library
                       , old-time
                       , binary
   C-Sources:            cbits/conv.c
+  include-dirs:         cbits
 
 Test-Suite doctest
   Type:                 exitcode-stdio-1.0
