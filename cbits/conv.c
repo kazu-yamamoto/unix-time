@@ -16,6 +16,7 @@
 #include <time.h>
 #include <locale.h>
 #include <stdlib.h>
+#include <stdio.h>
 
 #if THREAD_SAFE
 #if HAVE_XLOCALE_H
@@ -32,10 +33,42 @@ void init_locale() {
     static int initialized = 0;
     if (initialized == 0) {
         setlocale(LC_TIME, "C");
-	initialized == 1;
+        initialized = 1;
     }
 }
 #endif
+
+#if defined(_WIN32)
+
+#include <Windows.h>
+
+static int setenv(const char *var, const char *val, int ovr) {
+    BOOL b = SetEnvironmentVariableA(var, val);
+    if (b) {
+        return 0;
+    } else {
+        return 1;
+    }
+}
+
+static int unsetenv(const char *name) {
+	int len = strlen(name);
+    char *sname = (char *)malloc(len + 2);
+    strcpy(sname, name);
+    sname[len] = '=';
+    sname[len + 1] = '\0';
+    int r = _putenv(sname);
+    free(sname);
+    return r;
+}
+
+#define gmtime_r(_time_t, _tm) gmtime_s(_tm, _time_t)
+#define localtime_r(_time_t, _tm) localtime_s(_tm, _time_t)
+
+// implemented in strptime.c
+char *strptime(const char *buf, const char *fmt, struct tm *tm);
+
+#endif // _WIN32
 
 /*
  * Set the value of the TZ environment variable to UTC
@@ -66,7 +99,7 @@ time_t c_parse_unix_time(char *fmt, char *src) {
     struct tm dst;
     init_locale();
     memset(&dst, 0, sizeof(struct tm));
-#if THREAD_SAFE
+#if THREAD_SAFE && !defined(_WIN32)
     strptime_l(src, fmt, &dst, c_locale);
 #else
     strptime(src, fmt, &dst);
@@ -121,7 +154,7 @@ time_t c_parse_unix_time_gmt(char *fmt, char *src) {
     init_locale();
     memset(&dst, 0, sizeof(struct tm));
     local_tz = set_tz_utc();
-#if THREAD_SAFE
+#if THREAD_SAFE && !defined(_WIN32)
     strptime_l(src, fmt, &dst, c_locale);
 #else
     strptime(src, fmt, &dst);
@@ -134,7 +167,7 @@ size_t c_format_unix_time(char *fmt, time_t src, char* dst, int siz) {
     struct tm tim;
     init_locale();
     localtime_r(&src, &tim);
-#if THREAD_SAFE
+#if THREAD_SAFE && !defined(_WIN32)
     return strftime_l(dst, siz, fmt, &tim, c_locale);
 #else
     return strftime(dst, siz, fmt, &tim);
@@ -150,7 +183,7 @@ size_t c_format_unix_time_gmt(char *fmt, time_t src, char* dst, int siz) {
     gmtime_r(&src, &tim);
 
     local_tz = set_tz_utc();
-#if THREAD_SAFE
+#if THREAD_SAFE && !defined(_WIN32)
     dst_size = strftime_l(dst, siz, fmt, &tim, c_locale);
 #else
     dst_size = strftime(dst, siz, fmt, &tim);
