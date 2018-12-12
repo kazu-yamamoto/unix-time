@@ -49,7 +49,11 @@ void init_locale() {
 char *set_tz_utc() {
     char *tz;
     tz = getenv("TZ");
+#if defined(_WIN32)
     _patch_setenv("TZ", "", 1);
+#else
+    setenv("TZ", "", 1);
+#endif
     tzset();
     return tz;
 }
@@ -60,9 +64,17 @@ char *set_tz_utc() {
  */
 void set_tz(char *local_tz) {
     if (local_tz) {
+#if defined(_WIN32)
       _patch_setenv("TZ", local_tz, 1);
+#else
+      setenv("TZ", local_tz, 1);
+#endif
     } else {
+#if defined(_WIN32)
       _patch_unsetenv("TZ");
+#else
+      unsetenv("TZ");
+#endif
     }
     tzset();
 }
