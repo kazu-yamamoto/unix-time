@@ -71,7 +71,7 @@ time_t c_parse_unix_time(char *fmt, char *src) {
     struct tm dst;
     init_locale();
     memset(&dst, 0, sizeof(struct tm));
-#if THREAD_SAFE && !defined(_WIN32)
+#if THREAD_SAFE
     strptime_l(src, fmt, &dst, c_locale);
 #else
     strptime(src, fmt, &dst);
@@ -98,10 +98,10 @@ timegm (struct tm *tm)
   unsigned i;
 
   for (i = 70; i < tm->tm_year; ++i)
-    res += isleap(i) ? 366 : 365;
+    res += isleap(i + 1900) ? 366 : 365;
 
   for (i = 0; i < tm->tm_mon; ++i)
-    res += ndays[isleap(tm->tm_year)][i];
+    res += ndays[isleap(tm->tm_year + 1900)][i];
   res += tm->tm_mday - 1;
   res *= 24;
   res += tm->tm_hour;
@@ -119,7 +119,7 @@ time_t c_parse_unix_time_gmt(char *fmt, char *src) {
     init_locale();
     memset(&dst, 0, sizeof(struct tm));
     local_tz = set_tz_utc();
-#if THREAD_SAFE && !defined(_WIN32)
+#if THREAD_SAFE
     strptime_l(src, fmt, &dst, c_locale);
 #else
     strptime(src, fmt, &dst);
@@ -132,7 +132,7 @@ size_t c_format_unix_time(char *fmt, time_t src, char* dst, int siz) {
     struct tm tim;
     init_locale();
     localtime_r(&src, &tim);
-#if THREAD_SAFE && !defined(_WIN32)
+#if THREAD_SAFE
 #if defined(_WIN32)
     return _patch_strftime_l(dst, siz, fmt, &tim, c_locale);
 #else
@@ -156,7 +156,7 @@ size_t c_format_unix_time_gmt(char *fmt, time_t src, char* dst, int siz) {
     gmtime_r(&src, &tim);
 
     local_tz = set_tz_utc();
-#if THREAD_SAFE && !defined(_WIN32)
+#if THREAD_SAFE
 #if defined(_WIN32)
     dst_size = _patch_strftime_l(dst, siz, fmt, &tim, c_locale);
 #else

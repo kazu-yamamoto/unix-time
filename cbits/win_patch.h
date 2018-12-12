@@ -1,6 +1,8 @@
 #ifndef UNIX_TIME_WIN_PATCH_H
 #define UNIX_TIME_WIN_PATCH_H
 
+#include "config.h"
+
 #include <sys/cdefs.h>
 
 #include <time.h>
@@ -11,7 +13,9 @@
 #include <string.h>
 #include <pthread.h>
 
+#if defined(_WIN32)
 #include <Windows.h>
+#endif
 
 #if !defined(TM_YEAR_BASE)
 #define TM_YEAR_BASE 1900
@@ -80,7 +84,14 @@
 #define isspace_l _isspace_l
 #define isupper_l _isupper_l
 #define isdigit_l _isdigit_l
-#define strtol_l  _strtol_l
+
+#if !HAVE_STRTOL_L
+long strtol_l(const char *nptr, char **endptr, int base, _locale_t locale);
+#endif
+
+#if !HAVE_STRTOLL_L
+long long strtoll_l(const char *nptr, char **endptr, int base, _locale_t locale);
+#endif
 
 #define isleap(y) (((y) % 4) == 0 && (((y) % 100) != 0 || ((y) % 400) == 0))
 
@@ -99,7 +110,10 @@ struct tm *gmtime_r(const time_t *_time_t, struct tm *_tm);
 
 struct tm *localtime_r(const time_t *_time_t, struct tm *_tm);
 
+#if HAVE__MKGMTIME
 #define timegm _mkgmtime
+#define HAVE_TIMEGM 1
+#endif
 
 #define fprintf_l(fp, loc, ...) fprintf(fp, ##__VA_ARGS__)
 #define sprintf_l(buf, loc, ...) sprintf(buf, ##__VA_ARGS__)

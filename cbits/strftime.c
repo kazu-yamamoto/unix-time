@@ -310,10 +310,9 @@ label:
 					tm = *t;
 					mkt = mktime(&tm);
 					if (TYPE_SIGNED(time_t))
-						(void) sprintf_l(buf, loc, "%ld",
-							(long) mkt);
-					else	(void) sprintf_l(buf, loc, "%lu",
-							(unsigned long) mkt);
+						(void) sprintf_l(buf, loc, "%lld", (long long)mkt);
+					else
+						(void) sprintf_l(buf, loc, "%llu", (unsigned long long)mkt);
 					pt = _add(buf, pt, ptlim);
 				}
 				continue;
@@ -515,11 +514,7 @@ label:
 				 * appropriate variables are not available.
 				 */
 				if (t->tm_isdst == 0)
-#ifdef USG_COMPAT
 					diff = -timezone;
-#else /* !defined USG_COMPAT */
-					continue;
-#endif /* !defined USG_COMPAT */
 				else
 #ifdef ALTZONE
 					diff = -altzone;

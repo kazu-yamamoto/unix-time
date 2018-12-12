@@ -488,13 +488,13 @@ label:
 			{
 			char *cp;
 			int sverrno;
-			long n;
+			long long n;
 			time_t t;
 
 			sverrno = errno;
 			errno = 0;
-			n = strtol_l(buf, &cp, 10, locale);
-			if (errno == ERANGE || (long)(t = n) != n) {
+			n = strtoll_l(buf, &cp, 10, locale);
+			if (errno == ERANGE || (long long)(t = n) != n) {
 				errno = sverrno;
 				return (NULL);
 			}

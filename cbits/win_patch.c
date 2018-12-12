@@ -1,5 +1,17 @@
 #include "win_patch.h"
 
+#if !HAVE_STRTOL_L
+long strtol_l(const char *nptr, char **endptr, int base, _locale_t locale) {
+    return strtol(nptr, endptr, base);
+}
+#endif
+
+#if !HAVE_STRTOLL_L
+long long strtoll_l(const char *nptr, char **endptr, int base, _locale_t locale) {
+    return strtoll(nptr, endptr, base);
+}
+#endif
+
 inline int isblank_l( int c, _locale_t _loc)
 {
     return ( c == ' ' || c == '\t' );
