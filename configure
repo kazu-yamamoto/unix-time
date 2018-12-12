@@ -3304,6 +3304,17 @@ _ACEOF
 fi
 done
 
+for ac_func in _get_current_locale
+do :
+  ac_fn_c_check_func "$LINENO" "_get_current_locale" "ac_cv_func__get_current_locale"
+if test "x$ac_cv_func__get_current_locale" = xyes; then :
+  cat >>confdefs.h <<_ACEOF
+#define HAVE__GET_CURRENT_LOCALE 1
+_ACEOF
+
+fi
+done
+
 
 host=`uname -a`
 case $host in

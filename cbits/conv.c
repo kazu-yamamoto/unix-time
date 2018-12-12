@@ -18,6 +18,10 @@
 #include <stdlib.h>
 #include <stdio.h>
 
+#if defined(_WIN32)
+#include "win_patch.h"
+#endif // _WIN32
+
 #if THREAD_SAFE
 #if HAVE_XLOCALE_H
 #include <xlocale.h>
@@ -38,38 +42,6 @@ void init_locale() {
 }
 #endif
 
-#if defined(_WIN32)
-
-#include <Windows.h>
-
-static int setenv(const char *var, const char *val, int ovr) {
-    BOOL b = SetEnvironmentVariableA(var, val);
-    if (b) {
-        return 0;
-    } else {
-        return 1;
-    }
-}
-
-static int unsetenv(const char *name) {
-	int len = strlen(name);
-    char *sname = (char *)malloc(len + 2);
-    strcpy(sname, name);
-    sname[len] = '=';
-    sname[len + 1] = '\0';
-    int r = _putenv(sname);
-    free(sname);
-    return r;
-}
-
-#define gmtime_r(_time_t, _tm) gmtime_s(_tm, _time_t)
-#define localtime_r(_time_t, _tm) localtime_s(_tm, _time_t)
-
-// implemented in strptime.c
-char *strptime(const char *buf, const char *fmt, struct tm *tm);
-
-#endif // _WIN32
-
 /*
  * Set the value of the TZ environment variable to UTC
  * and return the old value.
@@ -77,7 +49,7 @@ char *strptime(const char *buf, const char *fmt, struct tm *tm);
 char *set_tz_utc() {
     char *tz;
     tz = getenv("TZ");
-    setenv("TZ", "", 1);
+    _patch_setenv("TZ", "", 1);
     tzset();
     return tz;
 }
@@ -88,9 +60,9 @@ char *set_tz_utc() {
  */
 void set_tz(char *local_tz) {
     if (local_tz) {
-      setenv("TZ", local_tz, 1);
+      _patch_setenv("TZ", local_tz, 1);
     } else {
-      unsetenv("TZ");
+      _patch_unsetenv("TZ");
     }
     tzset();
 }
@@ -116,13 +88,6 @@ time_t c_parse_unix_time(char *fmt, char *src) {
  * All rights reserved.
  */
 
-static int
-is_leap(unsigned y)
-{
-  y += 1900;
-  return (y % 4) == 0 && ((y % 100) != 0 || (y % 400) == 0);
-}
-
 static time_t
 timegm (struct tm *tm)
 {
@@ -133,10 +98,10 @@ timegm (struct tm *tm)
   unsigned i;
 
   for (i = 70; i < tm->tm_year; ++i)
-    res += is_leap(i) ? 366 : 365;
+    res += isleap(i) ? 366 : 365;
 
   for (i = 0; i < tm->tm_mon; ++i)
-    res += ndays[is_leap(tm->tm_year)][i];
+    res += ndays[isleap(tm->tm_year)][i];
   res += tm->tm_mday - 1;
   res *= 24;
   res += tm->tm_hour;
@@ -168,9 +133,17 @@ size_t c_format_unix_time(char *fmt, time_t src, char* dst, int siz) {
     init_locale();
     localtime_r(&src, &tim);
 #if THREAD_SAFE && !defined(_WIN32)
+#if defined(_WIN32)
+    return _patch_strftime_l(dst, siz, fmt, &tim, c_locale);
+#else
     return strftime_l(dst, siz, fmt, &tim, c_locale);
+#endif // _WIN32
+#else
+#if defined(_WIN32)
+    return _patch_strftime(dst, siz, fmt, &tim);
 #else
     return strftime(dst, siz, fmt, &tim);
+#endif // _WIN32
 #endif
 }
 
@@ -184,9 +157,17 @@ size_t c_format_unix_time_gmt(char *fmt, time_t src, char* dst, int siz) {
 
     local_tz = set_tz_utc();
 #if THREAD_SAFE && !defined(_WIN32)
+#if defined(_WIN32)
+    dst_size = _patch_strftime_l(dst, siz, fmt, &tim, c_locale);
+#else
     dst_size = strftime_l(dst, siz, fmt, &tim, c_locale);
+#endif // _WIN32
+#else
+#if defined(_WIN32)
+    dst_size = _patch_strftime(dst, siz, fmt, &tim);
 #else
     dst_size = strftime(dst, siz, fmt, &tim);
+#endif // _WIN32
 #endif
     set_tz(local_tz);
     return dst_size;

@@ -30,6 +30,9 @@
 /* Define to 1 if you have the `timegm' function. */
 #undef HAVE_TIMEGM
 
+/* Define to 1 if you have the `timegm' function. */
+#undef HAVE__GET_CURRENT_LOCALE
+
 /* Define to 1 if you have the <unistd.h> header file. */
 #undef HAVE_UNISTD_H
 
