@@ -30,6 +30,18 @@
 /* Define to 1 if you have the `timegm' function. */
 #undef HAVE_TIMEGM
 
+/* Define to 1 if you have the `_mkgmtime' function. */
+#undef HAVE__MKGMTIME
+
+/* Define to 1 if you have the `_get_current_locale' function. */
+#undef HAVE__GET_CURRENT_LOCALE
+
+/* Define to 1 if you have the `strtol_l' function. */
+#undef HAVE_STRTOL_L
+
+/* Define to 1 if you have the `strtoll_l' function. */
+#undef HAVE_STRTOLL_L
+
 /* Define to 1 if you have the <unistd.h> header file. */
 #undef HAVE_UNISTD_H
 

@@ -3304,6 +3304,50 @@ _ACEOF
 fi
 done
 
+for ac_func in _mkgmtime
+do :
+  ac_fn_c_check_func "$LINENO" "_mkgmtime" "ac_cv_func__mkgmtime"
+if test "x$ac_cv_func__mkgmtime" = xyes; then :
+  cat >>confdefs.h <<_ACEOF
+#define HAVE__MKGMTIME 1
+_ACEOF
+
+fi
+done
+
+for ac_func in _get_current_locale
+do :
+  ac_fn_c_check_func "$LINENO" "_get_current_locale" "ac_cv_func__get_current_locale"
+if test "x$ac_cv_func__get_current_locale" = xyes; then :
+  cat >>confdefs.h <<_ACEOF
+#define HAVE__GET_CURRENT_LOCALE 1
+_ACEOF
+
+fi
+done
+
+for ac_func in strtol_l
+do :
+  ac_fn_c_check_func "$LINENO" "strtol_l" "ac_cv_func_strtol_l"
+if test "x$ac_cv_func_strtol_l" = xyes; then :
+  cat >>confdefs.h <<_ACEOF
+#define HAVE_STRTOL_L 1
+_ACEOF
+
+fi
+done
+
+for ac_func in strtoll_l
+do :
+  ac_fn_c_check_func "$LINENO" "strtoll_l" "ac_cv_func_strtoll_l"
+if test "x$ac_cv_func_strtoll_l" = xyes; then :
+  cat >>confdefs.h <<_ACEOF
+#define HAVE_STRTOLL_L 1
+_ACEOF
+
+fi
+done
+
 
 host=`uname -a`
 case $host in

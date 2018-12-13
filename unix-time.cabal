@@ -27,6 +27,10 @@ Library
                       , old-time
                       , binary
   C-Sources:            cbits/conv.c
+  if os(windows)
+    C-Sources:          cbits/strftime.c
+                      , cbits/strptime.c
+                      , cbits/win_patch.c
   include-dirs:         cbits
 
 Test-Suite doctest

@@ -4,6 +4,9 @@ import Control.Applicative ((<$>), (<*>))
 import Data.ByteString
 import Data.ByteString.Char8 ()
 import Data.Int
+#if defined(_WIN32)
+import Data.Word
+#endif
 import Foreign.C.Types
 import Foreign.Storable
 #if __GLASGOW_HASKELL__ >= 704
@@ -34,12 +37,37 @@ data UnixTime = UnixTime {
 instance Storable UnixTime where
     sizeOf _    = (#size struct timeval)
     alignment _ = (#const offsetof(struct {char x__; struct timeval (y__); }, y__))
+#if defined(_WIN32)
+    -- On windows, with mingw-w64, the struct `timeval` is defined as
+    --
+    --      struct timeval
+    --      {
+    --          long tv_sec;
+    --          long tv_usec;
+    --      };
+    --
+    -- The type `long` is 32bit on windows 64bit, however the CTime is 64bit, thus
+    -- we must be careful about the layout of its foreign memory.
+    --
+    -- Here we try use Word32, rather than Int32, to support as large value as possible.
+    -- For example, we use `4294967295` as utSeconds in testsuite, which already exceeds
+    -- the range of Int32, but not for Word32.
+    peek ptr    = do
+            sec <- (#peek struct timeval, tv_sec) ptr :: IO Word32
+            msec <- (#peek struct timeval, tv_usec) ptr
+            return $ UnixTime (fromIntegral sec) msec
+    poke ptr ut = do
+            let CTime sec = utSeconds ut
+            (#poke struct timeval, tv_sec)  ptr (fromIntegral sec :: Word32)
+            (#poke struct timeval, tv_usec) ptr (utMicroSeconds ut)
+#else
     peek ptr    = UnixTime
             <$> (#peek struct timeval, tv_sec)  ptr
             <*> (#peek struct timeval, tv_usec) ptr
     poke ptr ut = do
             (#poke struct timeval, tv_sec)  ptr (utSeconds ut)
             (#poke struct timeval, tv_usec) ptr (utMicroSeconds ut)
+#endif
 
 #if __GLASGOW_HASKELL__ >= 704
 instance Binary UnixTime where
