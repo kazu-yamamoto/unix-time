@@ -9,7 +9,14 @@ Description:            Fast parser\/formatter\/utilities for Unix time
 Category:               Data
 Cabal-Version:          >= 1.10
 Build-Type:             Configure
-Extra-Source-Files:     cbits/conv.c cbits/config.h.in configure configure.ac
+Extra-Source-Files:     cbits/config.h.in
+                        cbits/conv.c
+                        cbits/strftime.c
+                        cbits/strptime.c
+                        cbits/win_patch.c
+                        cbits/win_patch.h
+                        configure
+                        configure.ac
 Extra-Tmp-Files:        config.log config.status autom4te.cache cbits/config.h
 
 Library
@@ -31,7 +38,6 @@ Library
     C-Sources:          cbits/strftime.c
                       , cbits/strptime.c
                       , cbits/win_patch.c
-                      , cbits/win_patch.h
   include-dirs:         cbits
 
 Test-Suite doctest
