@@ -476,7 +476,7 @@ label:
 				else
 #endif /* defined TM_ZONE */
 				if (t->tm_isdst >= 0)
-					pt = _add(tzname[t->tm_isdst != 0],
+					pt = _add(_tzname[t->tm_isdst != 0],
 						pt, ptlim);
 				/*
 				 * C99 says that %Z must be replaced by the
@@ -514,7 +514,7 @@ label:
 				 * appropriate variables are not available.
 				 */
 				if (t->tm_isdst == 0)
-					diff = -timezone;
+					diff = -_timezone;
 				else
 #ifdef ALTZONE
 					diff = -altzone;
