@@ -22,4 +22,4 @@ test_script:
 # The ugly echo "" hack is to avoid complaints about 0 being an invalid file
 # descriptor
 # disabling doctest since stack does not support it.
-- echo "" | stack --no-terminal test unix-time:spec --jobs 1
+- echo "" | stack --no-terminal test unix-time --jobs 1

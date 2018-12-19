@@ -548,9 +548,9 @@ label:
 				if (0 == strcmp(zonestr, "GMT") ||
 				    0 == strcmp(zonestr, "UTC")) {
 				    *GMTp = 1;
-				} else if (0 == strcmp(zonestr, tzname[0])) {
+				} else if (0 == strcmp(zonestr, _tzname[0])) {
 				    tm->tm_isdst = 0;
-				} else if (0 == strcmp(zonestr, tzname[1])) {
+				} else if (0 == strcmp(zonestr, _tzname[1])) {
 				    tm->tm_isdst = 1;
 				} else {
 				    return (NULL);
