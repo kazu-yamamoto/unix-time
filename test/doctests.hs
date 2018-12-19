@@ -1,11 +1,12 @@
 module Main where
 
-import Test.DocTest
+import Build_doctests (flags, pkgs, module_sources)
+import Data.Foldable (traverse_)
+import Test.DocTest (doctest)
 
 main :: IO ()
-main = doctest [
-    "-XOverloadedStrings"
-  , "-idist/build"
-  , "dist/build/cbits/conv.o"
-  , "Data/UnixTime.hs"
-  ]
+main = do
+    traverse_ putStrLn args
+    doctest args
+  where
+    args = ["-XOverloadedStrings"] ++ flags ++ pkgs ++ module_sources
