@@ -36,6 +36,7 @@ Library
                       , bytestring
                       , old-time
                       , binary
+  Build-Tools:          hsc2hs
   C-Sources:            cbits/conv.c
   if os(windows)
     C-Sources:          cbits/strftime.c
