@@ -28,6 +28,6 @@ main = defaultMainAutoconfWithDoctests "doctests"
 import Distribution.Simple
 
 main :: IO ()
-main = defaultMain
+main = defaultMainWithHooks autoconfUserHooks
 
 #endif
