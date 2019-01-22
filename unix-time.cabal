@@ -7,8 +7,8 @@ License-File:           LICENSE
 Synopsis:               Unix time parser/formatter and utilities
 Description:            Fast parser\/formatter\/utilities for Unix time
 Category:               Data
-Cabal-Version:          >= 1.10
-Build-Type:             Custom
+Cabal-Version:          1.18
+Build-Type:             Configure
 Extra-Source-Files:     cbits/config.h.in
                         cbits/conv.c
                         cbits/strftime.c
@@ -18,9 +18,6 @@ Extra-Source-Files:     cbits/config.h.in
                         configure
                         configure.ac
 Extra-Tmp-Files:        config.log config.status autom4te.cache cbits/config.h
-
-Custom-Setup
-  Setup-Depends:        base, Cabal, cabal-doctest >=1.0.6 && <1.1
 
 Library
   Default-Language:     Haskell2010
@@ -45,6 +42,7 @@ Library
   include-dirs:         cbits
 
 Test-Suite doctests
+  Buildable:            False
   Type:                 exitcode-stdio-1.0
   Default-Language:     Haskell2010
   HS-Source-Dirs:       test
@@ -61,14 +59,15 @@ Test-Suite spec
   Ghc-Options:          -Wall
   Main-Is:              Spec.hs
   Other-Modules:        UnixTimeSpec
+  Build-Tools:          hspec-discover >= 2.6
   Build-Depends:        base
                       , bytestring
-                      , hspec >= 1.5
                       , old-locale
                       , old-time
                       , QuickCheck
                       , time
                       , unix-time
+                      , hspec >= 2.6
 
 Source-Repository head
   Type:                 git
