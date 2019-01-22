@@ -36,11 +36,26 @@
 /* Define to 1 if you have the `_get_current_locale' function. */
 #undef HAVE__GET_CURRENT_LOCALE
 
+/* Define to 1 if you have the `_create_locale' function. */
+#undef HAVE__CREATE_LOCALE
+
 /* Define to 1 if you have the `strtol_l' function. */
 #undef HAVE_STRTOL_L
 
 /* Define to 1 if you have the `strtoll_l' function. */
 #undef HAVE_STRTOLL_L
+
+/* Define to 1 if you have the `isspace_l' function. */
+#undef HAVE__ISSPACE_L
+
+/* Define to 1 if you have the `isupper_l' function. */
+#undef HAVE__ISUPPER_L
+
+/* Define to 1 if you have the `isdigit_l' function. */
+#undef HAVE__ISDIGIT_L
+
+/* Define to 1 if you have the `isblank_l' function. */
+#undef HAVE__ISBLANK_L
 
 /* Define to 1 if you have the <unistd.h> header file. */
 #undef HAVE_UNISTD_H

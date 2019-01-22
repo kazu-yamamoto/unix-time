@@ -10,8 +10,13 @@ AC_CHECK_FUNCS(strptime_l)
 AC_CHECK_FUNCS(timegm)
 AC_CHECK_FUNCS(_mkgmtime)
 AC_CHECK_FUNCS(_get_current_locale)
+AC_CHECK_FUNCS(_create_locale)
 AC_CHECK_FUNCS(strtol_l)
 AC_CHECK_FUNCS(strtoll_l)
+AC_CHECK_FUNCS(_isspace_l)
+AC_CHECK_FUNCS(_isupper_l)
+AC_CHECK_FUNCS(_isdigit_l)
+AC_CHECK_FUNCS(_isblank_l)
 
 host=`uname -a`
 case $host in
