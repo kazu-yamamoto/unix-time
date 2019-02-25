@@ -150,6 +150,10 @@ struct lc_time_T {
     const char  *ampm_fmt;
 };
 
+#define isspace_l(ch, locale) isspace(ch)
+#define isupper_l(ch, locale) isupper(ch)
+#define isdigit_l(ch, locale) isdigit(ch)
+
 extern const struct lc_time_T   _C_time_locale;
 
 int _patch_setenv(const char *var, const char *val, int ovr);
