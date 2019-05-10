@@ -81,23 +81,23 @@
     1 + TYPE_SIGNED(type))
 #endif /* !defined INT_STRLEN_MAXIMUM */
 
-#if HAVE__ISSPACE_L
-#define isspace_l _isspace_l
-#else
+/* #if HAVE__ISSPACE_L */
+/* #define isspace_l _isspace_l */
+/* #else */
 #define isspace_l(ch, locale) isspace(ch)
-#endif
+/* #endif */
 
-#if HAVE__ISUPPER_L
-#define isupper_l _isupper_l
-#else
+/* #if HAVE__ISUPPER_L */
+/* #define isupper_l _isupper_l */
+/* #else */
 #define isupper_l(ch, locale) isupper(ch)
-#endif
+/* #endif */
 
-#if HAVE__ISDIGIT_L
-#define isdigit_l _isdigit_l
-#else
+/* #if HAVE__ISDIGIT_L */
+/* #define isdigit_l _isdigit_l */
+/* #else */
 #define isdigit_l(ch, locale) isdigit(ch)
-#endif
+/* #endif */
 
 #if !HAVE_STRTOL_L
 long strtol_l(const char *nptr, char **endptr, int base, _locale_t locale);
@@ -149,10 +149,6 @@ struct lc_time_T {
     const char  *md_order;
     const char  *ampm_fmt;
 };
-
-#define isspace_l(ch, locale) isspace(ch)
-#define isupper_l(ch, locale) isupper(ch)
-#define isdigit_l(ch, locale) isdigit(ch)
 
 extern const struct lc_time_T   _C_time_locale;
 
