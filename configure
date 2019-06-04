@@ -3419,6 +3419,22 @@ cat >>confdefs.h <<_ACEOF
 #define IS_LINUX $LINUX
 _ACEOF
 
+
+case $host in
+  MINGW??_NT-6.1*)
+	NT61=1
+	;;
+  *)
+	NT61=0
+	;;
+esac
+
+
+cat >>confdefs.h <<_ACEOF
+#define IS_NT61 $NT61
+_ACEOF
+
+
 cat >confcache <<\_ACEOF
 # This file is a shell script that caches the results of configure
 # tests run on this system so they can be shared between configure

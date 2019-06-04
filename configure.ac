@@ -29,4 +29,16 @@ case $host in
 esac
 
 AC_DEFINE_UNQUOTED(IS_LINUX,$LINUX,"Is Linux")
+
+case $host in
+  MINGW??_NT-6.1*)
+	NT61=1
+	;;
+  *)
+	NT61=0
+	;;
+esac
+
+AC_DEFINE_UNQUOTED(IS_NT61,$NT61,"Is Windows NT 6.1")
+
 AC_OUTPUT

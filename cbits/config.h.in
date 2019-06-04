@@ -21,6 +21,12 @@
 /* Define to 1 if you have the `strptime_l' function. */
 #undef HAVE_STRPTIME_L
 
+/* Define to 1 if you have the `strtoll_l' function. */
+#undef HAVE_STRTOLL_L
+
+/* Define to 1 if you have the `strtol_l' function. */
+#undef HAVE_STRTOL_L
+
 /* Define to 1 if you have the <sys/stat.h> header file. */
 #undef HAVE_SYS_STAT_H
 
@@ -30,41 +36,38 @@
 /* Define to 1 if you have the `timegm' function. */
 #undef HAVE_TIMEGM
 
-/* Define to 1 if you have the `_mkgmtime' function. */
-#undef HAVE__MKGMTIME
-
-/* Define to 1 if you have the `_get_current_locale' function. */
-#undef HAVE__GET_CURRENT_LOCALE
-
-/* Define to 1 if you have the `_create_locale' function. */
-#undef HAVE__CREATE_LOCALE
-
-/* Define to 1 if you have the `strtol_l' function. */
-#undef HAVE_STRTOL_L
-
-/* Define to 1 if you have the `strtoll_l' function. */
-#undef HAVE_STRTOLL_L
-
-/* Define to 1 if you have the `isspace_l' function. */
-#undef HAVE__ISSPACE_L
-
-/* Define to 1 if you have the `isupper_l' function. */
-#undef HAVE__ISUPPER_L
-
-/* Define to 1 if you have the `isdigit_l' function. */
-#undef HAVE__ISDIGIT_L
-
-/* Define to 1 if you have the `isblank_l' function. */
-#undef HAVE__ISBLANK_L
-
 /* Define to 1 if you have the <unistd.h> header file. */
 #undef HAVE_UNISTD_H
 
 /* Define to 1 if you have the <xlocale.h> header file. */
 #undef HAVE_XLOCALE_H
 
+/* Define to 1 if you have the `_create_locale' function. */
+#undef HAVE__CREATE_LOCALE
+
+/* Define to 1 if you have the `_get_current_locale' function. */
+#undef HAVE__GET_CURRENT_LOCALE
+
+/* Define to 1 if you have the `_isblank_l' function. */
+#undef HAVE__ISBLANK_L
+
+/* Define to 1 if you have the `_isdigit_l' function. */
+#undef HAVE__ISDIGIT_L
+
+/* Define to 1 if you have the `_isspace_l' function. */
+#undef HAVE__ISSPACE_L
+
+/* Define to 1 if you have the `_isupper_l' function. */
+#undef HAVE__ISUPPER_L
+
+/* Define to 1 if you have the `_mkgmtime' function. */
+#undef HAVE__MKGMTIME
+
 /* "Is Linux" */
 #undef IS_LINUX
+
+/* "Is Windows NT 6.1" */
+#undef IS_NT61
 
 /* Define to the address where bug reports for this package should be sent. */
 #undef PACKAGE_BUGREPORT
