@@ -8,6 +8,9 @@ import Foreign.C.Types
 import Foreign.Marshal.Alloc
 import Foreign.Ptr
 import Foreign.Storable
+#if defined(_WIN32)
+import Data.Word
+#endif
 
 -- from System.Time
 
@@ -26,6 +29,11 @@ foreign import ccall unsafe "gettimeofday"
 getUnixTime :: IO UnixTime
 getUnixTime = allocaBytes (#const sizeof(struct timeval)) $ \ p_timeval -> do
     throwErrnoIfMinus1_ "getClockTime" $ c_gettimeofday p_timeval nullPtr
+#if defined(_WIN32)
+    sec' <- ((#peek struct timeval,tv_sec)  p_timeval) :: IO Word32
+    let sec = fromIntegral sec'
+#else
     sec  <- (#peek struct timeval,tv_sec)  p_timeval
+#endif
     usec <- (#peek struct timeval,tv_usec) p_timeval
     return $ UnixTime sec usec
