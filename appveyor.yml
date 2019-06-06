@@ -21,4 +21,5 @@ test_script:
 - stack setup > nul
 # The ugly echo "" hack is to avoid complaints about 0 being an invalid file
 # descriptor
+- bash enable_doctest.sh
 - echo "" | stack --no-terminal test unix-time --jobs 1

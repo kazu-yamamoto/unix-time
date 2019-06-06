@@ -712,7 +712,10 @@ strptime(const char * __restrict buf, const char * __restrict fmt,
 {
 #if HAVE__GET_CURRENT_LOCALE
 	return strptime_l(buf, fmt, tm, _get_current_locale());
-#else
+#elif HAVE__CREATE_LOCALE && !IS_NT61
 	return strptime_l(buf, fmt, tm, _create_locale(LC_TIME, "C"));
+#else
+	_locale_t locale;
+	return strptime_l(buf, fmt, tm, locale);
 #endif
 }

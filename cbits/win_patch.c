@@ -12,10 +12,12 @@ long long strtoll_l(const char *nptr, char **endptr, int base, _locale_t locale)
 }
 #endif
 
+#if !HAVE__ISBLANK_L
 inline int isblank_l( int c, _locale_t _loc)
 {
     return ( c == ' ' || c == '\t' );
 }
+#endif
 
 inline int strncasecmp_l(const char *s1, const char *s2, int len, _locale_t _loc) {
     return strncasecmp(s1, s2, len);

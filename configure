@@ -3326,6 +3326,17 @@ _ACEOF
 fi
 done
 
+for ac_func in _create_locale
+do :
+  ac_fn_c_check_func "$LINENO" "_create_locale" "ac_cv_func__create_locale"
+if test "x$ac_cv_func__create_locale" = xyes; then :
+  cat >>confdefs.h <<_ACEOF
+#define HAVE__CREATE_LOCALE 1
+_ACEOF
+
+fi
+done
+
 for ac_func in strtol_l
 do :
   ac_fn_c_check_func "$LINENO" "strtol_l" "ac_cv_func_strtol_l"
@@ -3348,6 +3359,50 @@ _ACEOF
 fi
 done
 
+for ac_func in _isspace_l
+do :
+  ac_fn_c_check_func "$LINENO" "_isspace_l" "ac_cv_func__isspace_l"
+if test "x$ac_cv_func__isspace_l" = xyes; then :
+  cat >>confdefs.h <<_ACEOF
+#define HAVE__ISSPACE_L 1
+_ACEOF
+
+fi
+done
+
+for ac_func in _isupper_l
+do :
+  ac_fn_c_check_func "$LINENO" "_isupper_l" "ac_cv_func__isupper_l"
+if test "x$ac_cv_func__isupper_l" = xyes; then :
+  cat >>confdefs.h <<_ACEOF
+#define HAVE__ISUPPER_L 1
+_ACEOF
+
+fi
+done
+
+for ac_func in _isdigit_l
+do :
+  ac_fn_c_check_func "$LINENO" "_isdigit_l" "ac_cv_func__isdigit_l"
+if test "x$ac_cv_func__isdigit_l" = xyes; then :
+  cat >>confdefs.h <<_ACEOF
+#define HAVE__ISDIGIT_L 1
+_ACEOF
+
+fi
+done
+
+for ac_func in _isblank_l
+do :
+  ac_fn_c_check_func "$LINENO" "_isblank_l" "ac_cv_func__isblank_l"
+if test "x$ac_cv_func__isblank_l" = xyes; then :
+  cat >>confdefs.h <<_ACEOF
+#define HAVE__ISBLANK_L 1
+_ACEOF
+
+fi
+done
+
 
 host=`uname -a`
 case $host in
@@ -3363,6 +3418,22 @@ esac
 cat >>confdefs.h <<_ACEOF
 #define IS_LINUX $LINUX
 _ACEOF
+
+
+case $host in
+  MINGW??_NT-6.1*)
+	NT61=1
+	;;
+  *)
+	NT61=0
+	;;
+esac
+
+
+cat >>confdefs.h <<_ACEOF
+#define IS_NT61 $NT61
+_ACEOF
+
 
 cat >confcache <<\_ACEOF
 # This file is a shell script that caches the results of configure
