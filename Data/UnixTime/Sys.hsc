@@ -8,9 +8,6 @@ import Foreign.C.Types
 import Foreign.Marshal.Alloc
 import Foreign.Ptr
 import Foreign.Storable
-#if defined(_WIN32)
-import Data.Word
-#endif
 
 -- from System.Time
 
