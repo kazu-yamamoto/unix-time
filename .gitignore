@@ -1,9 +1,10 @@
-dist
+dist*
 cbits/config.h
+cbits/config.h.in~
 config.log
 config.status
 .cabal-sandbox/
 cabal.sandbox.config
-
+.ghc.environment.*
 # stack
 .stack-work
