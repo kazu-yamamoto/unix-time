@@ -71,6 +71,7 @@ parseUnixTimeGMT fmt str = unsafePerformIO $
 -- This is a wrapper for strftime_l().
 -- 'utMicroSeconds' is ignored.
 -- The result depends on the TZ environment variable.
+--
 
 formatUnixTime :: Format -> UnixTime -> IO ByteString
 formatUnixTime fmt t =

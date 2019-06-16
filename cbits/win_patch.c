@@ -100,18 +100,26 @@ const struct lc_time_T   _C_time_locale = {
 };
 
 
-int _patch_setenv(const char *var, const char *val, int ovr) {
-    BOOL b = SetEnvironmentVariableA(var, val);
-    if (b) {
-        return 0;
-    } else {
-        return 1;
+int _patch_setenv(const char *var, const char *val, int _ovr) {
+    if (val == NULL) {
+        return _patch_unsetenv(var);
     }
+    int varlen = strlen(var);
+    int vallen = strlen(val);
+    int len = varlen + vallen + 2;
+    char *sname = (char *)malloc(len);
+    strcpy(sname, var);
+    sname[strlen(var)] = '=';
+    strcpy(sname + varlen + 1, val);
+    sname[len + 1] = '\0';
+    int r = _putenv(sname);
+    free(sname);
+    return r;
 }
 
 int _patch_unsetenv(const char *name) {
-    int len = strlen(name);
-    char *sname = (char *)malloc(len + 2);
+    int len = strlen(name) + 2;
+    char *sname = (char *)malloc(len);
     strcpy(sname, name);
     sname[len] = '=';
     sname[len + 1] = '\0';
