@@ -109,9 +109,9 @@ int _patch_setenv(const char *var, const char *val, int _ovr) {
     int len = varlen + vallen + 2;
     char *sname = (char *)malloc(len);
     strcpy(sname, var);
-    sname[strlen(var)] = '=';
+    sname[varlen] = '=';
     strcpy(sname + varlen + 1, val);
-    sname[len + 1] = '\0';
+    sname[varlen + vallen + 1] = '\0';
     int r = _putenv(sname);
     free(sname);
     return r;
