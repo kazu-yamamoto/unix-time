@@ -522,7 +522,8 @@ label:
 #ifdef ALTZONE
 					diff = -altzone;
 #else /* !defined ALTZONE */
-					continue;
+					// Fix the daylight saving time, see #54.
+					diff = -(_timezone - 3600 * t->tm_isdst);
 #endif /* !defined ALTZONE */
 #endif /* !defined TM_GMTOFF */
 				if (diff < 0) {

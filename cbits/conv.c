@@ -50,7 +50,7 @@ char *set_tz_utc() {
     char *tz;
     tz = getenv("TZ");
 #if defined(_WIN32)
-    _patch_setenv("TZ", "", 1);
+    _patch_setenv("TZ", "UTC", 1);
 #else
     setenv("TZ", "", 1);
 #endif
