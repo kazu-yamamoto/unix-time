@@ -93,7 +93,7 @@ type Format = ByteString
 -- create values that are in-range. This avoids any gotchas when then
 -- doing comparisons.
 data UnixDiffTime = UnixDiffTime {
-    -- | Seconds from 1st Jan 1970
+    -- | Seconds
     udtSeconds :: {-# UNPACK #-} !CTime
     -- | Micro seconds (i.e. 10^(-6))
   , udtMicroSeconds :: {-# UNPACK #-} !Int32
