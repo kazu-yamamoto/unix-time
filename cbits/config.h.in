@@ -1,5 +1,9 @@
 /* cbits/config.h.in.  Generated from configure.ac by autoheader.  */
 
+/* Define to 1 if you have the declaration of `_mkgmtime', and to 0 if you
+   don't. */
+#undef HAVE_DECL__MKGMTIME
+
 /* Define to 1 if you have the <inttypes.h> header file. */
 #undef HAVE_INTTYPES_H
 
@@ -59,9 +63,6 @@
 
 /* Define to 1 if you have the `_isupper_l' function. */
 #undef HAVE__ISUPPER_L
-
-/* Define to 1 if you have the `_mkgmtime' function. */
-#undef HAVE__MKGMTIME
 
 /* "Is Linux" */
 #undef IS_LINUX
