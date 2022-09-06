@@ -116,7 +116,11 @@ long long strtoll_l(const char *nptr, char **endptr, int base, _locale_t locale)
 #define isleap_sum(a, b)    isleap((a) % 400 + (b) % 400)
 #endif /* !defined isleap_sum */
 
-#if !HAVE__ISBLANK_L
+#if HAVE__ISBLANK_L
+#define isblank_l _isblank_l
+// Needed to avoid -Wimplicit-function-declaration warnings
+int _isblank_l(int c, _locale_t  loc);
+#else
 int isblank_l( int c, _locale_t _loc);
 #endif
 
@@ -126,7 +130,7 @@ struct tm *gmtime_r(const time_t *_time_t, struct tm *_tm);
 
 struct tm *localtime_r(const time_t *_time_t, struct tm *_tm);
 
-#if HAVE__MKGMTIME
+#if HAVE_DECL__MKGMTIME
 #define timegm _mkgmtime
 #define HAVE_TIMEGM 1
 #endif

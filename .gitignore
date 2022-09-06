@@ -8,3 +8,4 @@ cabal.sandbox.config
 .ghc.environment.*
 # stack
 .stack-work
+autom4te.cache/*
