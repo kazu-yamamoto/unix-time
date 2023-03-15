@@ -11,6 +11,9 @@ import Data.UnixTime.Types
 import Data.Int
 import Foreign.C.Types
 
+-- $setup
+-- >>> :set -XOverloadedStrings
+
 ----------------------------------------------------------------
 
 calc :: CTime -> Int32 -> UnixDiffTime
@@ -63,7 +66,7 @@ diffUnixTime (UnixTime s1 u1) (UnixTime s2 u2) = calc (s1-s2) (u1-u2)
 
 -- | Adding difference to 'UnixTime'.
 --
--- >>> UnixTime 100 2000 `addUnixDiffTime` microSecondsToUnixDiffTime (-1003000)
+-- >>> UnixTime 100 2000 `addUnixDiffTime` microSecondsToUnixDiffTime ((-1003000) :: Int)
 -- UnixTime {utSeconds = 98, utMicroSeconds = 999000}
 
 addUnixDiffTime :: UnixTime -> UnixDiffTime -> UnixTime
@@ -71,7 +74,7 @@ addUnixDiffTime (UnixTime s1 u1) (UnixDiffTime s2 u2) = calcU (s1+s2) (u1+u2)
 
 -- | Creating difference from seconds.
 --
--- >>> secondsToUnixDiffTime 100
+-- >>> secondsToUnixDiffTime (100 :: Int)
 -- UnixDiffTime {udtSeconds = 100, udtMicroSeconds = 0}
 
 secondsToUnixDiffTime :: (Integral a) => a -> UnixDiffTime
@@ -80,10 +83,10 @@ secondsToUnixDiffTime sec = UnixDiffTime (fromIntegral sec) 0
 
 -- | Creating difference from micro seconds.
 --
--- >>> microSecondsToUnixDiffTime 12345678
+-- >>> microSecondsToUnixDiffTime (12345678 :: Int)
 -- UnixDiffTime {udtSeconds = 12, udtMicroSeconds = 345678}
 --
--- >>> microSecondsToUnixDiffTime (-12345678)
+-- >>> microSecondsToUnixDiffTime ((-12345678) :: Int)
 -- UnixDiffTime {udtSeconds = -12, udtMicroSeconds = -345678}
 
 microSecondsToUnixDiffTime :: (Integral a) => a -> UnixDiffTime

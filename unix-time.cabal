@@ -41,17 +41,6 @@ Library
                       , cbits/win_patch.c
   include-dirs:         cbits
 
-Test-Suite doctests
-  Buildable:            False
-  Type:                 exitcode-stdio-1.0
-  Default-Language:     Haskell2010
-  HS-Source-Dirs:       test
-  Ghc-Options:          -threaded -Wall
-  Main-Is:              doctests.hs
-  Build-Depends:        base
-                      , doctest >= 0.9.3
-                      , unix-time
-
 Test-Suite spec
   Type:                 exitcode-stdio-1.0
   Default-Language:     Haskell2010
