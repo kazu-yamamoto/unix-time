@@ -1,4 +1,5 @@
-{-# LANGUAGE OverloadedStrings, ForeignFunctionInterface #-}
+{-# LANGUAGE ForeignFunctionInterface #-}
+{-# LANGUAGE OverloadedStrings #-}
 
 module Data.UnixTime.Conv (
     formatUnixTime, formatUnixTimeGMT
@@ -9,7 +10,7 @@ module Data.UnixTime.Conv (
   ) where
 
 import Control.Applicative
-import Data.ByteString
+import Data.ByteString.Char8
 import Data.ByteString.Unsafe
 import Data.UnixTime.Types
 import Foreign.C.String
@@ -21,6 +22,7 @@ import System.Time (ClockTime(..))
 
 -- $setup
 -- >>> import Data.Function (on)
+-- >>> :set -XOverloadedStrings
 
 foreign import ccall unsafe "c_parse_unix_time"
         c_parse_unix_time :: CString -> CString -> IO CTime
