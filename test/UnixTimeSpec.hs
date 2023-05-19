@@ -68,7 +68,10 @@ spec = do
                 pokePeek ptr = poke ptr ut >> peek ptr
             in shouldReturn (alloca pokePeek) ut
 
-    describe "getTimeOfDay" $
+    describe "getUnixTime" $ do
+        it "works well" $ do
+           x <- getUnixTime
+           x `shouldBe` x
         it "should work in Template Haskell" $
             $(do time <- TH.runIO getUnixTime
                  let b = time == time
