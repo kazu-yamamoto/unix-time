@@ -1,4 +1,4 @@
-{-# LANGUAGE OverloadedStrings, FlexibleInstances, CPP #-}
+{-# LANGUAGE OverloadedStrings, FlexibleInstances, CPP, TemplateHaskell #-}
 {-# OPTIONS_GHC -fno-warn-orphans #-}
 
 module UnixTimeSpec (main, spec) where
@@ -12,6 +12,7 @@ import Data.UnixTime
 import Foreign.Ptr (Ptr)
 import Foreign.Marshal.Alloc (alloca)
 import Foreign.Storable (peek, poke)
+import qualified Language.Haskell.TH as TH (runIO)
 import Test.Hspec
 import Test.Hspec.QuickCheck (prop)
 import Test.QuickCheck hiding ((===))
@@ -66,6 +67,13 @@ spec = do
             let pokePeek :: Ptr UnixTime -> IO UnixTime
                 pokePeek ptr = poke ptr ut >> peek ptr
             in shouldReturn (alloca pokePeek) ut
+
+    describe "getTimeOfDay" $
+        it "should work in Template Haskell" $
+            $(do time <- TH.runIO getUnixTime
+                 let b = time == time
+                 [| b |])
+            `shouldBe` True
 
 formatMailModel :: UTCTime -> TimeZone -> ByteString
 formatMailModel ut zone = BS.pack $ formatTime defaultTimeLocale fmt zt
