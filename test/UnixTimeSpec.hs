@@ -1,4 +1,7 @@
-{-# LANGUAGE OverloadedStrings, FlexibleInstances, CPP, TemplateHaskell #-}
+{-# LANGUAGE CPP #-}
+{-# LANGUAGE FlexibleInstances #-}
+{-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE TemplateHaskell #-}
 {-# OPTIONS_GHC -fno-warn-orphans #-}
 
 module UnixTimeSpec (main, spec) where
@@ -9,8 +12,8 @@ import Data.Function (on)
 import Data.Time
 import Data.Time.Clock.POSIX (posixSecondsToUTCTime)
 import Data.UnixTime
-import Foreign.Ptr (Ptr)
 import Foreign.Marshal.Alloc (alloca)
+import Foreign.Ptr (Ptr)
 import Foreign.Storable (peek, poke)
 import qualified Language.Haskell.TH as TH (runIO)
 import Test.Hspec
@@ -26,12 +29,13 @@ main = hspec spec
 
 instance Arbitrary UnixTime where
     arbitrary = do
-        a <- choose (0,4294967295) :: Gen Int
-        b <- choose (0,999999) :: Gen Int
-        let ut = UnixTime {
-                utSeconds = abs (fromIntegral a)
-              , utMicroSeconds = fromIntegral b
-              }
+        a <- choose (0, 4294967295) :: Gen Int
+        b <- choose (0, 999999) :: Gen Int
+        let ut =
+                UnixTime
+                    { utSeconds = abs (fromIntegral a)
+                    , utMicroSeconds = fromIntegral b
+                    }
         return ut
 
 spec :: Spec
@@ -47,42 +51,44 @@ spec = do
     describe "parseUnixTimeGMT & formatUnixTimeGMT" $ do
         let (===) = (==) `on` utSeconds
         prop "inverses the result" $ \ut ->
-            let dt  = formatUnixTimeGMT webDateFormat ut
-                ut' = parseUnixTimeGMT  webDateFormat dt
+            let dt = formatUnixTimeGMT webDateFormat ut
+                ut' = parseUnixTimeGMT webDateFormat dt
                 dt' = formatUnixTimeGMT webDateFormat ut'
-            in ut === ut' && dt == dt'
+             in ut === ut' && dt == dt'
         prop "inverses the result (2)" $ \ut ->
             let str = formatUnixTimeGMT "%s" ut
                 ut' = parseUnixTimeGMT "%s" str
-            in ut === ut'
+             in ut === ut'
 
     describe "addUnixDiffTime & diffUnixTime" $
         prop "invrses the result" $ \(ut0, ut1) ->
             let ut0' = addUnixDiffTime ut1 $ diffUnixTime ut0 ut1
                 ut1' = addUnixDiffTime ut0 $ diffUnixTime ut1 ut0
-            in ut0' == ut0 && ut1' == ut1
+             in ut0' == ut0 && ut1' == ut1
 
     describe "UnixTime Storable instance" $
         prop "peek . poke = id" $ \ut ->
             let pokePeek :: Ptr UnixTime -> IO UnixTime
                 pokePeek ptr = poke ptr ut >> peek ptr
-            in shouldReturn (alloca pokePeek) ut
+             in shouldReturn (alloca pokePeek) ut
 
     describe "getUnixTime" $ do
         it "works well" $ do
-           x <- getUnixTime
-           x `shouldBe` x
+            x <- getUnixTime
+            x `shouldBe` x
         it "should work in Template Haskell" $
-            $(do time <- TH.runIO getUnixTime
-                 let b = time == time
-                 [| b |])
-            `shouldBe` True
+            $( do
+                time <- TH.runIO getUnixTime
+                let b = time == time
+                [|b|]
+             )
+                `shouldBe` True
 
 formatMailModel :: UTCTime -> TimeZone -> ByteString
 formatMailModel ut zone = BS.pack $ formatTime defaultTimeLocale fmt zt
   where
-   zt = utcToZonedTime zone ut
-   fmt = BS.unpack mailDateFormat
+    zt = utcToZonedTime zone ut
+    fmt = BS.unpack mailDateFormat
 
 toUTCTime :: UnixTime -> UTCTime
 toUTCTime = posixSecondsToUTCTime . realToFrac . toEpochTime

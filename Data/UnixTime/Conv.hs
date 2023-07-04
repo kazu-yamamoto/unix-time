@@ -2,12 +2,17 @@
 {-# LANGUAGE OverloadedStrings #-}
 
 module Data.UnixTime.Conv (
-    formatUnixTime, formatUnixTimeGMT
-  , parseUnixTime, parseUnixTimeGMT
-  , webDateFormat, mailDateFormat
-  , fromEpochTime, toEpochTime
-  , fromClockTime, toClockTime
-  ) where
+    formatUnixTime,
+    formatUnixTimeGMT,
+    parseUnixTime,
+    parseUnixTimeGMT,
+    webDateFormat,
+    mailDateFormat,
+    fromEpochTime,
+    toEpochTime,
+    fromClockTime,
+    toClockTime,
+) where
 
 import Control.Applicative
 import Data.ByteString.Char8
@@ -18,23 +23,23 @@ import Foreign.C.Types
 import Foreign.Marshal.Alloc
 import System.IO.Unsafe (unsafePerformIO)
 import System.Posix.Types (EpochTime)
-import System.Time (ClockTime(..))
+import System.Time (ClockTime (..))
 
 -- $setup
 -- >>> import Data.Function (on)
 -- >>> :set -XOverloadedStrings
 
 foreign import ccall unsafe "c_parse_unix_time"
-        c_parse_unix_time :: CString -> CString -> IO CTime
+    c_parse_unix_time :: CString -> CString -> IO CTime
 
 foreign import ccall unsafe "c_parse_unix_time_gmt"
-        c_parse_unix_time_gmt :: CString -> CString -> IO CTime
+    c_parse_unix_time_gmt :: CString -> CString -> IO CTime
 
 foreign import ccall unsafe "c_format_unix_time"
-        c_format_unix_time :: CString -> CTime -> CString -> CInt -> IO CSize
+    c_format_unix_time :: CString -> CTime -> CString -> CInt -> IO CSize
 
 foreign import ccall unsafe "c_format_unix_time_gmt"
-        c_format_unix_time_gmt :: CString -> CTime -> CString -> CInt -> IO CSize
+    c_format_unix_time_gmt :: CString -> CTime -> CString -> CInt -> IO CSize
 
 ----------------------------------------------------------------
 
@@ -44,13 +49,13 @@ foreign import ccall unsafe "c_format_unix_time_gmt"
 -- Many implementations of strptime_l() do not support %Z and
 -- some implementations of strptime_l() do not support %z, either.
 -- 'utMicroSeconds' is always set to 0.
-
 parseUnixTime :: Format -> ByteString -> UnixTime
 parseUnixTime fmt str = unsafePerformIO $
     useAsCString fmt $ \cfmt ->
         useAsCString str $ \cstr -> do
             sec <- c_parse_unix_time cfmt cstr
             return $ UnixTime sec 0
+
 -- |
 -- Parsing 'ByteString' to 'UnixTime' interpreting as GMT.
 -- This is a wrapper for strptime_l().
@@ -58,7 +63,6 @@ parseUnixTime fmt str = unsafePerformIO $
 --
 -- >>> parseUnixTimeGMT webDateFormat "Thu, 01 Jan 1970 00:00:00 GMT"
 -- UnixTime {utSeconds = 0, utMicroSeconds = 0}
-
 parseUnixTimeGMT :: Format -> ByteString -> UnixTime
 parseUnixTimeGMT fmt str = unsafePerformIO $
     useAsCString fmt $ \cfmt ->
@@ -73,8 +77,6 @@ parseUnixTimeGMT fmt str = unsafePerformIO $
 -- This is a wrapper for strftime_l().
 -- 'utMicroSeconds' is ignored.
 -- The result depends on the TZ environment variable.
---
-
 formatUnixTime :: Format -> UnixTime -> IO ByteString
 formatUnixTime fmt t =
     formatUnixTimeHelper c_format_unix_time fmt t
@@ -94,7 +96,6 @@ formatUnixTime fmt t =
 -- True
 -- >>> ((==) `on` utMicroSeconds) ut ut'
 -- False
-
 formatUnixTimeGMT :: Format -> UnixTime -> ByteString
 formatUnixTimeGMT fmt t =
     unsafePerformIO $ formatUnixTimeHelper c_format_unix_time_gmt fmt t
@@ -102,7 +103,6 @@ formatUnixTimeGMT fmt t =
 
 -- |
 -- Helper handling memory allocation for formatUnixTime and formatUnixTimeGMT.
-
 formatUnixTimeHelper
     :: (CString -> CTime -> CString -> CInt -> IO CSize)
     -> Format
@@ -111,8 +111,8 @@ formatUnixTimeHelper
 formatUnixTimeHelper formatFun fmt (UnixTime sec _) =
     useAsCString fmt $ \cfmt -> do
         let siz = 80
-        ptr  <- mallocBytes siz
-        len  <- fromIntegral <$> formatFun cfmt sec ptr (fromIntegral siz)
+        ptr <- mallocBytes siz
+        len <- fromIntegral <$> formatFun cfmt sec ptr (fromIntegral siz)
         ptr' <- reallocBytes ptr (len + 1)
         unsafePackMallocCString ptr' -- FIXME: Use unsafePackMallocCStringLen from bytestring-0.10.2.0
 
@@ -122,7 +122,6 @@ formatUnixTimeHelper formatFun fmt (UnixTime sec _) =
 -- Format for web (RFC 2616).
 -- The value is \"%a, %d %b %Y %H:%M:%S GMT\".
 -- This should be used with 'formatUnixTimeGMT' and 'parseUnixTimeGMT'.
-
 webDateFormat :: Format
 webDateFormat = "%a, %d %b %Y %H:%M:%S GMT"
 
@@ -130,7 +129,6 @@ webDateFormat = "%a, %d %b %Y %H:%M:%S GMT"
 -- Format for e-mail (RFC 5322).
 -- The value is \"%a, %d %b %Y %H:%M:%S %z\".
 -- This should be used with 'formatUnixTime' and 'parseUnixTime'.
-
 mailDateFormat :: Format
 mailDateFormat = "%a, %d %b %Y %H:%M:%S %z"
 
@@ -138,19 +136,16 @@ mailDateFormat = "%a, %d %b %Y %H:%M:%S %z"
 
 -- |
 -- From 'EpochTime' to 'UnixTime' setting 'utMicroSeconds' to 0.
-
 fromEpochTime :: EpochTime -> UnixTime
 fromEpochTime sec = UnixTime sec 0
 
 -- |
 -- From 'UnixTime' to 'EpochTime' ignoring 'utMicroSeconds'.
-
 toEpochTime :: UnixTime -> EpochTime
 toEpochTime (UnixTime sec _) = sec
 
 -- |
 -- From 'ClockTime' to 'UnixTime'.
-
 fromClockTime :: ClockTime -> UnixTime
 fromClockTime (TOD sec psec) = UnixTime sec' usec'
   where
@@ -159,7 +154,6 @@ fromClockTime (TOD sec psec) = UnixTime sec' usec'
 
 -- |
 -- From 'UnixTime' to 'ClockTime'.
-
 toClockTime :: UnixTime -> ClockTime
 toClockTime (UnixTime sec usec) = TOD sec' psec'
   where
