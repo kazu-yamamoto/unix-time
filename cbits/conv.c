@@ -4,7 +4,7 @@
 /* Linux cheats AC_CHECK_FUNCS(strptime_l), sigh. */
 #define THREAD_SAFE 0
 #define _XOPEN_SOURCE
-#define _BSD_SOURCE
+#define _DEFAULT_SOURCE
 #elif HAVE_STRPTIME_L
 #define THREAD_SAFE 1
 #define _GNU_SOURCE
