@@ -1,3 +1,5 @@
+{-# LANGUAGE DeriveGeneric #-}
+
 module Data.UnixTime.Types where
 
 import Control.Applicative ((<$>), (<*>))
@@ -12,6 +14,7 @@ import Foreign.Storable
 #if __GLASGOW_HASKELL__ >= 704
 import Data.Binary
 #endif
+import GHC.Generics
 
 #include <sys/time.h>
 
@@ -32,7 +35,7 @@ data UnixTime = UnixTime {
     utSeconds :: {-# UNPACK #-} !CTime
     -- | Micro seconds (i.e. 10^(-6))
   , utMicroSeconds :: {-# UNPACK #-} !Int32
-  } deriving (Eq,Ord,Show)
+  } deriving (Eq,Ord,Show,Generic)
 
 instance Storable UnixTime where
     sizeOf _    = (#size struct timeval)
