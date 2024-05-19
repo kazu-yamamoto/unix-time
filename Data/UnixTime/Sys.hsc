@@ -1,3 +1,4 @@
+{-# LANGUAGE CApiFFI #-}
 {-# LANGUAGE ForeignFunctionInterface #-}
 
 module Data.UnixTime.Sys (getUnixTime) where
@@ -17,7 +18,7 @@ import Foreign.Storable
 type CTimeVal = ()
 type CTimeZone = ()
 
-foreign import ccall unsafe "gettimeofday"
+foreign import capi unsafe "sys/time.h gettimeofday"
     c_gettimeofday :: Ptr CTimeVal -> Ptr CTimeZone -> IO CInt
 
 -- |
