@@ -64,12 +64,29 @@ instance Storable UnixTime where
             (#poke struct timeval, tv_sec)  ptr (fromIntegral sec :: Word32)
             (#poke struct timeval, tv_usec) ptr (utMicroSeconds ut)
 #else
-    peek ptr    = UnixTime
-            <$> (#peek struct timeval, tv_sec)  ptr
-            <*> (#peek struct timeval, tv_usec) ptr
+    -- On Unix, the struct `timeval` is defined as
+    --
+    --      struct timeval
+    --      {
+    --          time_t      tv_sec;
+    --          suseconds_t tv_usec;
+    --      };
+    --
+    -- The type `suseconds_t` is a signed integer type capable of storing
+    -- values at least in the range `[-1, 1000000]`. It's size is platform
+    -- specific, and it is 8 bytes long on 64-bit platforms.
+    --
+    -- Here we peek `tv_usec` using the `CSUSeconds` type and then convert it
+    -- to `Int32` (the type of `utMicroSeconds`) relying on the fact that
+    -- `tv_usec` is no bigger than `1000000`, and hence we will not overflow.
+    peek ptr    = do
+            sec <- (#peek struct timeval, tv_sec) ptr
+            CSUSeconds msec <- (#peek struct timeval, tv_usec) ptr
+            return $ UnixTime sec (fromIntegral msec)
     poke ptr ut = do
+            let msec = CSUSeconds $ fromIntegral (utMicroSeconds ut)
             (#poke struct timeval, tv_sec)  ptr (utSeconds ut)
-            (#poke struct timeval, tv_usec) ptr (utMicroSeconds ut)
+            (#poke struct timeval, tv_usec) ptr msec
 #endif
 
 #if __GLASGOW_HASKELL__ >= 704
