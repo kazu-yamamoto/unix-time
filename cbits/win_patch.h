@@ -14,7 +14,7 @@
 #include <pthread.h>
 
 #if defined(_WIN32)
-#include <Windows.h>
+#include <windows.h>
 #endif
 
 #if !defined(TM_YEAR_BASE)
