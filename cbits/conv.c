@@ -55,7 +55,9 @@ char *set_tz_utc() {
 #else
     setenv("TZ", "", 1);
 #endif
+#if defined(HAVE_TZSET)
     tzset();
+#endif
     return tz;
 }
 
@@ -77,7 +79,9 @@ void set_tz(char *local_tz) {
       unsetenv("TZ");
 #endif
     }
+#if defined(HAVE_TZSET)
     tzset();
+#endif
 }
 
 time_t c_parse_unix_time(char *fmt, char *src) {
