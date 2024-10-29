@@ -25,6 +25,8 @@ extra-tmp-files:
     autom4te.cache
     cbits/config.h
 
+extra-doc-files:    ChangeLog.md
+
 source-repository head
     type:     git
     location: https://github.com/kazu-yamamoto/unix-time
@@ -51,17 +53,8 @@ library
     if impl(ghc >=7.8)
         cc-options: -fPIC
 
-    -- GHC 9.4.5, 9.6.1, and 9.6.2 on Windows do not link against mingwex, but
-    -- unix-time implicitly depends on this library due to the use of the
-    -- gettimeofday() function, which comes from mingwex on Windows. To avoid
-    -- linker errors in the absence of a mingwex dependency (see
-    -- https://gitlab.haskell.org/ghc/ghc/-/issues/23533 for an example of
-    -- this), we depend on mingwex explicitly here.
-    --
-    -- Other versions of GHC on Windows already depend on mingwex, so we guard
-    -- this behind appropriate conditionals.
     if os(windows)
-        if (impl(ghc >= 9.4.5) && !impl(ghc >= 9.4.6)) || (impl(ghc >= 9.6.1) && !impl(ghc >= 9.6.3))
+        if ((impl(ghc >=9.4.5) && !impl(ghc >=9.4.6)) || (impl(ghc >=9.6.1) && !impl(ghc >=9.6.3)))
             extra-libraries: mingwex
 
     if os(windows)
