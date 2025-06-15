@@ -118,8 +118,10 @@ long long strtoll_l(const char *nptr, char **endptr, int base, _locale_t locale)
 
 #if HAVE__ISBLANK_L
 #define isblank_l _isblank_l
+#ifndef _isblank_l
 // Needed to avoid -Wimplicit-function-declaration warnings
 int _isblank_l(int c, _locale_t  loc);
+#endif
 #else
 int isblank_l( int c, _locale_t _loc);
 #endif
