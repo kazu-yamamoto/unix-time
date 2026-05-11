@@ -47,7 +47,6 @@ library
     build-depends:
         base >=4.4 && <5,
         bytestring,
-        old-time,
         binary
 
     if impl(ghc >=7.8)
@@ -74,8 +73,6 @@ test-suite spec
     build-depends:
         base,
         bytestring,
-        old-locale,
-        old-time,
         QuickCheck,
         template-haskell,
         time,
