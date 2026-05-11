@@ -1,5 +1,10 @@
 # ChangeLog for unix-time
 
+## v0.5.0
+
+* Remove deprecated `old-time` dependency by dropping `fromClockTime` and `toClockTime`
+  [#68](https://github.com/kazu-yamamoto/unix-time/pull/68)
+
 ## v0.4.17
 
 * Fix MinGW64 linker error
