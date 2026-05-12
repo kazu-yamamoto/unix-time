@@ -25,9 +25,7 @@ module Data.UnixTime (
 
     -- * Translating time
     fromEpochTime,
-    toEpochTime,
-    fromClockTime,
-    toClockTime,
+    toEpochTime
 ) where
 
 import Data.UnixTime.Conv

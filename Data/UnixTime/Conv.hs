@@ -9,9 +9,7 @@ module Data.UnixTime.Conv (
     webDateFormat,
     mailDateFormat,
     fromEpochTime,
-    toEpochTime,
-    fromClockTime,
-    toClockTime,
+    toEpochTime
 ) where
 
 import Control.Applicative
@@ -23,7 +21,6 @@ import Foreign.C.Types
 import Foreign.Marshal.Alloc
 import System.IO.Unsafe (unsafePerformIO)
 import System.Posix.Types (EpochTime)
-import System.Time (ClockTime (..))
 
 -- $setup
 -- >>> import Data.Function (on)
@@ -143,19 +140,3 @@ fromEpochTime sec = UnixTime sec 0
 -- From 'UnixTime' to 'EpochTime' ignoring 'utMicroSeconds'.
 toEpochTime :: UnixTime -> EpochTime
 toEpochTime (UnixTime sec _) = sec
-
--- |
--- From 'ClockTime' to 'UnixTime'.
-fromClockTime :: ClockTime -> UnixTime
-fromClockTime (TOD sec psec) = UnixTime sec' usec'
-  where
-    sec' = fromIntegral sec
-    usec' = fromIntegral $ psec `div` 1000000
-
--- |
--- From 'UnixTime' to 'ClockTime'.
-toClockTime :: UnixTime -> ClockTime
-toClockTime (UnixTime sec usec) = TOD sec' psec'
-  where
-    sec' = truncate (toRational sec)
-    psec' = fromIntegral $ usec * 1000000
