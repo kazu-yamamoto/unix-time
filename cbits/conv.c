@@ -50,6 +50,8 @@ void init_locale() {
 char *set_tz_utc() {
     char *tz;
     tz = getenv("TZ");
+    /* setenv() may free the old string, so keep a copy. */
+    if (tz) tz = strdup(tz);
 #if defined(_WIN32)
     _patch_setenv("TZ", "UTC", 1);
 #else
@@ -72,6 +74,7 @@ void set_tz(char *local_tz) {
 #else
       setenv("TZ", local_tz, 1);
 #endif
+      free(local_tz);
     } else {
 #if defined(_WIN32)
       _patch_unsetenv("TZ");

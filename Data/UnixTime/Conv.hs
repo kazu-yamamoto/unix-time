@@ -13,6 +13,7 @@ module Data.UnixTime.Conv (
 ) where
 
 import Control.Applicative
+import Control.Concurrent.MVar (MVar, newMVar, withMVar)
 import Data.ByteString.Char8
 import Data.ByteString.Unsafe
 import Data.UnixTime.Types
@@ -38,6 +39,15 @@ foreign import ccall unsafe "c_format_unix_time"
 foreign import ccall unsafe "c_format_unix_time_gmt"
     c_format_unix_time_gmt :: CString -> CTime -> CString -> CInt -> IO CSize
 
+-- The GMT functions temporarily change the process-global TZ.
+-- Serialize all C calls so that concurrent calls cannot corrupt TZ.
+tzLock :: MVar ()
+tzLock = unsafePerformIO $ newMVar ()
+{-# NOINLINE tzLock #-}
+
+withTZLock :: IO a -> IO a
+withTZLock = withMVar tzLock . const
+
 ----------------------------------------------------------------
 
 -- |
@@ -50,7 +60,7 @@ parseUnixTime :: Format -> ByteString -> UnixTime
 parseUnixTime fmt str = unsafePerformIO $
     useAsCString fmt $ \cfmt ->
         useAsCString str $ \cstr -> do
-            sec <- c_parse_unix_time cfmt cstr
+            sec <- withTZLock $ c_parse_unix_time cfmt cstr
             return $ UnixTime sec 0
 
 -- |
@@ -64,7 +74,7 @@ parseUnixTimeGMT :: Format -> ByteString -> UnixTime
 parseUnixTimeGMT fmt str = unsafePerformIO $
     useAsCString fmt $ \cfmt ->
         useAsCString str $ \cstr -> do
-            sec <- c_parse_unix_time_gmt cfmt cstr
+            sec <- withTZLock $ c_parse_unix_time_gmt cfmt cstr
             return $ UnixTime sec 0
 
 ----------------------------------------------------------------
@@ -106,12 +116,19 @@ formatUnixTimeHelper
     -> UnixTime
     -> IO ByteString
 formatUnixTimeHelper formatFun fmt (UnixTime sec _) =
-    useAsCString fmt $ \cfmt -> do
-        let siz = 80
+    useAsCString fmt $ \cfmt -> loop cfmt 80
+  where
+    -- strftime() returns 0 if the result does not fit in the buffer.
+    -- Retry with a larger buffer but give up at a bound.
+    limit = 80 + 64 * Data.ByteString.Char8.length fmt
+    loop cfmt siz = do
         ptr <- mallocBytes siz
-        len <- fromIntegral <$> formatFun cfmt sec ptr (fromIntegral siz)
-        ptr' <- reallocBytes ptr (len + 1)
-        unsafePackMallocCString ptr' -- FIXME: Use unsafePackMallocCStringLen from bytestring-0.10.2.0
+        len <- withTZLock $ fromIntegral <$> formatFun cfmt sec ptr (fromIntegral siz)
+        if len == 0 && siz < limit
+            then free ptr >> loop cfmt (siz * 2)
+            else do
+                ptr' <- reallocBytes ptr (max 1 len)
+                unsafePackMallocCStringLen (ptr', len)
 
 ----------------------------------------------------------------
 

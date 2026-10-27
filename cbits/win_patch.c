@@ -121,8 +121,8 @@ int _patch_unsetenv(const char *name) {
     int len = strlen(name) + 2;
     char *sname = (char *)malloc(len);
     strcpy(sname, name);
-    sname[len] = '=';
-    sname[len + 1] = '\0';
+    sname[len - 2] = '=';
+    sname[len - 1] = '\0';
     int r = _putenv(sname);
     free(sname);
     return r;
