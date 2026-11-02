@@ -2,11 +2,13 @@ AC_INIT(cbits/conv.c)
 
 AC_DISABLE_OPTION_CHECKING
 
-AC_CONFIG_HEADER(cbits/config.h)
+AC_CONFIG_HEADERS(cbits/config.h)
 
 AC_CHECK_HEADERS(xlocale.h)
 
 AC_CHECK_FUNCS(strptime_l)
+AC_CHECK_FUNCS(strftime_l)
+AC_CHECK_MEMBERS([struct tm.tm_gmtoff, struct tm.tm_zone], [], [], [[#include <time.h>]])
 AC_CHECK_FUNCS(timegm)
 AC_CHECK_DECLS([_mkgmtime], [], [], [[#include <time.h>]])
 AC_CHECK_FUNCS(_get_current_locale)
@@ -19,17 +21,6 @@ AC_CHECK_FUNCS(_isdigit_l)
 AC_CHECK_FUNCS(_isblank_l)
 
 host=`uname -a`
-case $host in
-  Linux*)
-	LINUX=1
-	;;
-  *)
-	LINUX=0
-	;;
-esac
-
-AC_DEFINE_UNQUOTED(IS_LINUX,$LINUX,"Is Linux")
-
 case $host in
   MINGW??_NT-6.1*)
 	NT61=1

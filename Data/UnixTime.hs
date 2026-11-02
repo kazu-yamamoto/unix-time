@@ -8,6 +8,8 @@ module Data.UnixTime (
     -- * Parsing and formatting time
     parseUnixTime,
     parseUnixTimeGMT,
+    parseUnixTimeMaybe,
+    parseUnixTimeGMTMaybe,
     formatUnixTime,
     formatUnixTimeGMT,
 

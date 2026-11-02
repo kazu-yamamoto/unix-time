@@ -158,10 +158,6 @@ struct lc_time_T {
 
 extern const struct lc_time_T   _C_time_locale;
 
-int _patch_setenv(const char *var, const char *val, int ovr);
-
-int _patch_unsetenv(const char *name);
-
 size_t _patch_strftime(char * __restrict s, size_t maxsize, const char * __restrict format,
     const struct tm * __restrict t);
 
@@ -172,6 +168,9 @@ char *strptime_l(const char * __restrict buf, const char * __restrict fmt,
     struct tm * __restrict tm, _locale_t loc);
 
 char *strptime(const char * __restrict buf, const char * __restrict fmt,
+    struct tm * __restrict tm);
+
+char *_patch_strptime_utc(const char * __restrict buf, const char * __restrict fmt,
     struct tm * __restrict tm);
 
 #endif // UNIX_TIME_WIN_PATCH_H

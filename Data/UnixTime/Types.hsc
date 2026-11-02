@@ -2,7 +2,6 @@
 
 module Data.UnixTime.Types where
 
-import Control.Applicative ((<$>), (<*>))
 import Data.ByteString
 import Data.ByteString.Char8 ()
 import Data.Int
@@ -53,6 +52,7 @@ instance Storable UnixTime where
     -- we must be careful about the layout of its foreign memory.
     --
     -- Here we try use Word32, rather than Int32, to support as large value as possible.
+    -- So, times before 1970 cannot be represented.
     -- For example, we use `4294967295` as utSeconds in testsuite, which already exceeds
     -- the range of Int32, but not for Word32.
     peek ptr    = do
@@ -91,10 +91,13 @@ instance Storable UnixTime where
 
 #if __GLASGOW_HASKELL__ >= 704
 instance Binary UnixTime where
+        -- Seconds are always encoded as Int64 to be portable.
         put (UnixTime (CTime sec) msec) = do
-            put sec
+            put (fromIntegral sec :: Int64)
             put msec
-        get = UnixTime <$> (CTime `fmap` get) <*> get
+        get = do
+            sec <- get :: Get Int64
+            UnixTime (CTime (fromIntegral sec)) <$> get
 #endif
 
 -- |
@@ -104,14 +107,11 @@ type Format = ByteString
 -- |
 -- Data structure for UnixTime diff.
 --
--- It is up to the user to ensure that @'udtMicroSeconds' < 1000000@.
--- Helpers such as 'Data.UnixTime.microSecondsToUnixDiffTime' can help
--- you to create valid values. For example, it's a mistake to use
--- 'Data.Text.addUnixDiffTime' with a value @UnixDiffTime 0 9999999@
--- as it will produce an incorrect value back. You should instead use
--- functions such as 'Data.UnixTime.microSecondsToUnixDiffTime' to
--- create values that are in-range. This avoids any gotchas when then
--- doing comparisons.
+-- The functions in this library normalize values so that both fields
+-- have the same sign and @|'udtMicroSeconds'| < 1000000@.
+-- Use 'Data.UnixTime.microSecondsToUnixDiffTime' to create values.
+-- The derived 'Eq' and 'Ord' instances are meaningful only for
+-- normalized values.
 data UnixDiffTime = UnixDiffTime {
     -- | Seconds
     udtSeconds :: {-# UNPACK #-} !CTime

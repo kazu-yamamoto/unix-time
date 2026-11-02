@@ -1,6 +1,6 @@
 cabal-version:      1.18
 name:               unix-time
-version:            0.5.1
+version:            0.6.0
 license:            BSD3
 license-file:       LICENSE
 maintainer:         Kazu Yamamoto <kazu@iij.ad.jp>
@@ -45,7 +45,7 @@ library
     include-dirs:     cbits
     ghc-options:      -Wall
     build-depends:
-        base >=4.4 && <5,
+        base >=4.9 && <5,
         bytestring,
         binary
 
@@ -72,6 +72,7 @@ test-suite spec
     ghc-options:      -Wall -threaded -with-rtsopts=-N
     build-depends:
         base,
+        binary,
         bytestring,
         QuickCheck,
         template-haskell,

@@ -1,18 +1,18 @@
 #include "config.h"
 
-#if IS_LINUX
-/* Linux cheats AC_CHECK_FUNCS(strptime_l), sigh. */
-#define THREAD_SAFE 0
-#define _XOPEN_SOURCE
-#define _DEFAULT_SOURCE
-#define _BSD_SOURCE
-#elif HAVE_STRPTIME_L
+#if HAVE_STRPTIME_L && HAVE_STRFTIME_L
 #define THREAD_SAFE 1
 #define _GNU_SOURCE
 #else
 #define THREAD_SAFE 0
+#if !defined(_WIN32)
+#define _XOPEN_SOURCE
+#define _DEFAULT_SOURCE
+#define _BSD_SOURCE
+#endif
 #endif
 
+#include <limits.h>
 #include <string.h>
 #include <time.h>
 #include <locale.h>
@@ -23,172 +23,171 @@
 #include "win_patch.h"
 #endif // _WIN32
 
+/*
+ * c_init_locale() must be called once before the other functions.
+ * The Haskell side guarantees this.
+ */
 #if THREAD_SAFE
 #if HAVE_XLOCALE_H
 #include <xlocale.h>
 #endif
 
-locale_t c_locale = NULL;
+static locale_t c_locale = NULL;
 
-void init_locale() {
-    if (c_locale == NULL) c_locale = newlocale(LC_TIME_MASK, "C", NULL);
+void c_init_locale(void) {
+    c_locale = newlocale(LC_TIME_MASK, "C", NULL);
 }
+
+#define STRPTIME(src, fmt, tm) strptime_l(src, fmt, tm, c_locale)
+#define STRFTIME(dst, siz, fmt, tm) strftime_l(dst, siz, fmt, tm, c_locale)
 #else
-void init_locale() {
-    static int initialized = 0;
-    if (initialized == 0) {
-        setlocale(LC_TIME, "C");
-        initialized = 1;
-    }
+void c_init_locale(void) {
+    setlocale(LC_TIME, "C");
 }
-#endif
 
-/*
- * Set the value of the TZ environment variable to UTC
- * and return the old value.
- */
-char *set_tz_utc() {
-    char *tz;
-    tz = getenv("TZ");
-    /* setenv() may free the old string, so keep a copy. */
-    if (tz) tz = strdup(tz);
+#define STRPTIME(src, fmt, tm) strptime(src, fmt, tm)
 #if defined(_WIN32)
-    _patch_setenv("TZ", "UTC", 1);
+#define STRFTIME(dst, siz, fmt, tm) _patch_strftime(dst, siz, fmt, tm)
 #else
-    setenv("TZ", "", 1);
+#define STRFTIME(dst, siz, fmt, tm) strftime(dst, siz, fmt, tm)
+#endif // _WIN32
 #endif
-#if defined(HAVE_TZSET)
-    tzset();
-#endif
-    return tz;
-}
 
-/*
- * Set the value of the TZ environment variable to tz or
- * unset the variable if tz is null;
- */
-void set_tz(char *local_tz) {
-    if (local_tz) {
 #if defined(_WIN32)
-      _patch_setenv("TZ", local_tz, 1);
+/* Unlike strptime(), this does not convert the result to local time. */
+#define STRPTIME_UTC(src, fmt, tm) _patch_strptime_utc(src, fmt, tm)
 #else
-      setenv("TZ", local_tz, 1);
+#define STRPTIME_UTC(src, fmt, tm) STRPTIME(src, fmt, tm)
 #endif
-      free(local_tz);
-    } else {
-#if defined(_WIN32)
-      _patch_unsetenv("TZ");
-#else
-      unsetenv("TZ");
-#endif
-    }
-#if defined(HAVE_TZSET)
-    tzset();
-#endif
-}
-
-time_t c_parse_unix_time(char *fmt, char *src) {
-    struct tm dst;
-    init_locale();
-    memset(&dst, 0, sizeof(struct tm));
-#if THREAD_SAFE
-    strptime_l(src, fmt, &dst, c_locale);
-#else
-    strptime(src, fmt, &dst);
-#endif
-    return mktime(&dst);
-}
 
 #if !defined(HAVE_TIMEGM)
-/* This part is for Solaris that doesn't have timegm.
- * The copyright notice of timegm and is_leap is as below:
- *
- * Copyright (c) 1997 Kungliga Tekniska H.gskolan
- * (Royal Institute of Technology, Stockholm, Sweden).
- * All rights reserved.
- */
-
-static time_t
-timegm (struct tm *tm)
-{
-  static const unsigned ndays[2][12] ={
-    {31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31},
-    {31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31}};
-  time_t res = 0;
-  unsigned i;
-
-  for (i = 70; i < tm->tm_year; ++i)
-    res += isleap(i + 1900) ? 366 : 365;
-
-  for (i = 0; i < tm->tm_mon; ++i)
-    res += ndays[isleap(tm->tm_year + 1900)][i];
-  res += tm->tm_mday - 1;
-  res *= 24;
-  res += tm->tm_hour;
-  res *= 60;
-  res += tm->tm_min;
-  res *= 60;
-  res += tm->tm_sec;
-  return res;
+/* For systems without timegm(), e.g. Solaris. */
+static time_t unix_time_timegm(struct tm *tm) {
+    /* Normalize the month first, then count days from 1970-01-01. */
+    long long y = (long long)tm->tm_year + 1900 + tm->tm_mon / 12;
+    int m = tm->tm_mon % 12;
+    long long era, days;
+    unsigned yoe, doy, doe;
+    if (m < 0) { m += 12; y--; }
+    /* days_from_civil() by Howard Hinnant (March-based years). */
+    if (m < 2) y--;
+    era = (y >= 0 ? y : y - 399) / 400;
+    yoe = (unsigned)(y - era * 400);
+    doy = (153 * (m + (m < 2 ? 10 : -2)) + 2) / 5;
+    doe = yoe * 365 + yoe / 4 - yoe / 100 + doy;
+    days = era * 146097 + (long long)doe - 719468 + tm->tm_mday - 1;
+    return (time_t)(((days * 24 + tm->tm_hour) * 60 + tm->tm_min) * 60
+                    + tm->tm_sec);
 }
+#define timegm unix_time_timegm
 #endif /* HAVE_TIMEGM */
 
-time_t c_parse_unix_time_gmt(char *fmt, char *src) {
-    struct tm dst;
-    char *local_tz;
-    init_locale();
-    memset(&dst, 0, sizeof(struct tm));
-    local_tz = set_tz_utc();
-#if THREAD_SAFE
-    strptime_l(src, fmt, &dst, c_locale);
-#else
-    strptime(src, fmt, &dst);
+/*
+ * Parsing.
+ * None of the functions below touch the process-global TZ.
+ */
+
+#define NO_GMTOFF LONG_MIN
+
+/* Returns 1 if the entire src matches fmt. */
+static int parse(int utc, const char *fmt, const char *src, struct tm *tm) {
+    char *end;
+    memset(tm, 0, sizeof(struct tm));
+    /* Let mktime() decide whether DST is in effect. */
+    tm->tm_isdst = -1;
+#if HAVE_STRUCT_TM_TM_GMTOFF
+    tm->tm_gmtoff = NO_GMTOFF;
 #endif
-    set_tz(local_tz);
-    return timegm(&dst);
+    end = utc ? STRPTIME_UTC(src, fmt, tm) : STRPTIME(src, fmt, tm);
+    return end != NULL && *end == '\0';
 }
 
-size_t c_format_unix_time(char *fmt, time_t src, char* dst, int siz) {
-    struct tm tim;
-    init_locale();
-    localtime_r(&src, &tim);
-#if THREAD_SAFE
-#if defined(_WIN32)
-    return _patch_strftime_l(dst, siz, fmt, &tim, c_locale);
-#else
-    return strftime_l(dst, siz, fmt, &tim, c_locale);
-#endif // _WIN32
-#else
-#if defined(_WIN32)
-    return _patch_strftime(dst, siz, fmt, &tim);
-#else
-    return strftime(dst, siz, fmt, &tim);
-#endif // _WIN32
+/*
+ * Seconds since the epoch of the parsed time. Fields without an
+ * explicit zone are local time if utc is 0, or UTC otherwise.
+ */
+static time_t resolve(int utc, struct tm *tm) {
+#if HAVE_STRUCT_TM_TM_GMTOFF && HAVE_STRUCT_TM_TM_ZONE
+    /* BSD strptime() converts %s, %z and GMT to local time. */
+    if (tm->tm_zone != NULL) return mktime(tm);
+    /* glibc strptime() stores %z in tm_gmtoff only. */
+    if (tm->tm_gmtoff != NO_GMTOFF) {
+        long off = tm->tm_gmtoff;
+        tm->tm_gmtoff = 0;
+        return timegm(tm) - off;
+    }
+    tm->tm_gmtoff = 0;
 #endif
+    return utc ? timegm(tm) : mktime(tm);
 }
 
-size_t c_format_unix_time_gmt(char *fmt, time_t src, char* dst, int siz) {
+time_t c_parse_unix_time(char *fmt, char *src, int *ok) {
+    struct tm tm;
+    *ok = parse(0, fmt, src, &tm);
+    return resolve(0, &tm);
+}
+
+time_t c_parse_unix_time_gmt(char *fmt, char *src, int *ok) {
+    struct tm tm;
+    *ok = parse(1, fmt, src, &tm);
+    return resolve(1, &tm);
+}
+
+/*
+ * Formatting.
+ */
+
+size_t c_format_unix_time(char *fmt, time_t src, char *dst, int siz) {
     struct tm tim;
-    char *local_tz;
-    size_t dst_size;
+    if (localtime_r(&src, &tim) == NULL) return 0;
+    return STRFTIME(dst, siz, fmt, &tim);
+}
 
-    init_locale();
-    gmtime_r(&src, &tim);
-
-    local_tz = set_tz_utc();
-#if THREAD_SAFE
+/*
+ * strftime() may compute %s and %z from the local time zone
+ * (e.g. macOS), so expand them here. So does %Z on Windows.
+ */
+static char *expand_gmt_format(const char *fmt, time_t src) {
+    /* Each 2-byte directive expands to at most 21 bytes. */
+    char *buf = malloc(strlen(fmt) * 11 + 1);
+    char *p = buf;
+    if (buf == NULL) return NULL;
+    while (*fmt) {
+        if (fmt[0] != '%' || fmt[1] == '\0') {
+            *p++ = *fmt++;
+            continue;
+        }
+        switch (fmt[1]) {
+        case 's':
+            p += sprintf(p, "%lld", (long long)src);
+            break;
+        case 'z':
+            p += sprintf(p, "+0000");
+            break;
 #if defined(_WIN32)
-    dst_size = _patch_strftime_l(dst, siz, fmt, &tim, c_locale);
-#else
-    dst_size = strftime_l(dst, siz, fmt, &tim, c_locale);
-#endif // _WIN32
-#else
-#if defined(_WIN32)
-    dst_size = _patch_strftime(dst, siz, fmt, &tim);
-#else
-    dst_size = strftime(dst, siz, fmt, &tim);
-#endif // _WIN32
+        case 'Z':
+            p += sprintf(p, "UTC");
+            break;
 #endif
-    set_tz(local_tz);
-    return dst_size;
+        default:
+            *p++ = fmt[0];
+            *p++ = fmt[1];
+            break;
+        }
+        fmt += 2;
+    }
+    *p = '\0';
+    return buf;
+}
+
+size_t c_format_unix_time_gmt(char *fmt, time_t src, char *dst, int siz) {
+    struct tm tim;
+    char *gmt_fmt;
+    size_t len;
+    if (gmtime_r(&src, &tim) == NULL) return 0;
+    gmt_fmt = expand_gmt_format(fmt, src);
+    if (gmt_fmt == NULL) return 0;
+    len = STRFTIME(dst, siz, gmt_fmt, &tim);
+    free(gmt_fmt);
+    return len;
 }

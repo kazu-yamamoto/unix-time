@@ -6,20 +6,24 @@ module Data.UnixTime.Conv (
     formatUnixTimeGMT,
     parseUnixTime,
     parseUnixTimeGMT,
+    parseUnixTimeMaybe,
+    parseUnixTimeGMTMaybe,
     webDateFormat,
     mailDateFormat,
     fromEpochTime,
     toEpochTime
 ) where
 
-import Control.Applicative
-import Control.Concurrent.MVar (MVar, newMVar, withMVar)
-import Data.ByteString.Char8
-import Data.ByteString.Unsafe
+import Data.ByteString.Char8 (ByteString)
+import qualified Data.ByteString.Char8 as BS
+import Data.ByteString.Internal (createAndTrim)
+import Data.Char (isDigit)
 import Data.UnixTime.Types
 import Foreign.C.String
 import Foreign.C.Types
-import Foreign.Marshal.Alloc
+import Foreign.Marshal.Alloc (alloca)
+import Foreign.Ptr (Ptr, castPtr)
+import Foreign.Storable (peek)
 import System.IO.Unsafe (unsafePerformIO)
 import System.Posix.Types (EpochTime)
 
@@ -27,11 +31,14 @@ import System.Posix.Types (EpochTime)
 -- >>> import Data.Function (on)
 -- >>> :set -XOverloadedStrings
 
+foreign import ccall unsafe "c_init_locale"
+    c_init_locale :: IO ()
+
 foreign import ccall unsafe "c_parse_unix_time"
-    c_parse_unix_time :: CString -> CString -> IO CTime
+    c_parse_unix_time :: CString -> CString -> Ptr CInt -> IO CTime
 
 foreign import ccall unsafe "c_parse_unix_time_gmt"
-    c_parse_unix_time_gmt :: CString -> CString -> IO CTime
+    c_parse_unix_time_gmt :: CString -> CString -> Ptr CInt -> IO CTime
 
 foreign import ccall unsafe "c_format_unix_time"
     c_format_unix_time :: CString -> CTime -> CString -> CInt -> IO CSize
@@ -39,16 +46,29 @@ foreign import ccall unsafe "c_format_unix_time"
 foreign import ccall unsafe "c_format_unix_time_gmt"
     c_format_unix_time_gmt :: CString -> CTime -> CString -> CInt -> IO CSize
 
--- The GMT functions temporarily change the process-global TZ.
--- Serialize all C calls so that concurrent calls cannot corrupt TZ.
-tzLock :: MVar ()
-tzLock = unsafePerformIO $ newMVar ()
-{-# NOINLINE tzLock #-}
-
-withTZLock :: IO a -> IO a
-withTZLock = withMVar tzLock . const
+-- The C side must initialize its locale exactly once before use.
+localeReady :: ()
+localeReady = unsafePerformIO c_init_locale
+{-# NOINLINE localeReady #-}
 
 ----------------------------------------------------------------
+
+type CParser = CString -> CString -> Ptr CInt -> IO CTime
+
+parseHelper :: CParser -> Format -> ByteString -> (UnixTime, Bool)
+parseHelper parser fmt str = localeReady `seq` unsafePerformIO (
+    BS.useAsCString fmt $ \cfmt ->
+        BS.useAsCString str $ \cstr ->
+            alloca $ \pok -> do
+                sec <- parser cfmt cstr pok
+                ok <- peek pok
+                -- A NUL byte would silently truncate the C strings.
+                let complete = BS.notElem '\0' fmt && BS.notElem '\0' str
+                return (UnixTime sec 0, ok /= 0 && complete))
+
+toMaybe :: (UnixTime, Bool) -> Maybe UnixTime
+toMaybe (ut, True) = Just ut
+toMaybe _ = Nothing
 
 -- |
 -- Parsing 'ByteString' to 'UnixTime' interpreting as localtime.
@@ -56,26 +76,44 @@ withTZLock = withMVar tzLock . const
 -- Many implementations of strptime_l() do not support %Z and
 -- some implementations of strptime_l() do not support %z, either.
 -- 'utMicroSeconds' is always set to 0.
+--
+-- The result is unspecified if parsing fails.
+-- Use 'parseUnixTimeMaybe' to detect failures.
+--
+-- This depends on the TZ environment variable but is a pure function.
+-- So, the result may be shared even if TZ is changed later.
 parseUnixTime :: Format -> ByteString -> UnixTime
-parseUnixTime fmt str = unsafePerformIO $
-    useAsCString fmt $ \cfmt ->
-        useAsCString str $ \cstr -> do
-            sec <- withTZLock $ c_parse_unix_time cfmt cstr
-            return $ UnixTime sec 0
+parseUnixTime fmt str = fst $ parseHelper c_parse_unix_time fmt str
 
 -- |
 -- Parsing 'ByteString' to 'UnixTime' interpreting as GMT.
 -- This is a wrapper for strptime_l().
 -- 'utMicroSeconds' is always set to 0.
 --
+-- The result is unspecified if parsing fails.
+-- Use 'parseUnixTimeGMTMaybe' to detect failures.
+--
 -- >>> parseUnixTimeGMT webDateFormat "Thu, 01 Jan 1970 00:00:00 GMT"
 -- UnixTime {utSeconds = 0, utMicroSeconds = 0}
 parseUnixTimeGMT :: Format -> ByteString -> UnixTime
-parseUnixTimeGMT fmt str = unsafePerformIO $
-    useAsCString fmt $ \cfmt ->
-        useAsCString str $ \cstr -> do
-            sec <- withTZLock $ c_parse_unix_time_gmt cfmt cstr
-            return $ UnixTime sec 0
+parseUnixTimeGMT fmt str = fst $ parseHelper c_parse_unix_time_gmt fmt str
+
+-- |
+-- Like 'parseUnixTime' but returns 'Nothing' unless the entire input
+-- matches the format.
+parseUnixTimeMaybe :: Format -> ByteString -> Maybe UnixTime
+parseUnixTimeMaybe fmt str = toMaybe $ parseHelper c_parse_unix_time fmt str
+
+-- |
+-- Like 'parseUnixTimeGMT' but returns 'Nothing' unless the entire input
+-- matches the format.
+--
+-- >>> parseUnixTimeGMTMaybe webDateFormat "Thu, 01 Jan 1970 00:00:00 GMT"
+-- Just (UnixTime {utSeconds = 0, utMicroSeconds = 0})
+-- >>> parseUnixTimeGMTMaybe webDateFormat "garbage"
+-- Nothing
+parseUnixTimeGMTMaybe :: Format -> ByteString -> Maybe UnixTime
+parseUnixTimeGMTMaybe fmt str = toMaybe $ parseHelper c_parse_unix_time_gmt fmt str
 
 ----------------------------------------------------------------
 
@@ -110,25 +148,28 @@ formatUnixTimeGMT fmt t =
 
 -- |
 -- Helper handling memory allocation for formatUnixTime and formatUnixTimeGMT.
+-- A format containing a NUL byte is truncated there.
 formatUnixTimeHelper
     :: (CString -> CTime -> CString -> CInt -> IO CSize)
     -> Format
     -> UnixTime
     -> IO ByteString
 formatUnixTimeHelper formatFun fmt (UnixTime sec _) =
-    useAsCString fmt $ \cfmt -> loop cfmt 80
+    localeReady `seq` BS.useAsCString fmt (\cfmt -> loop cfmt 80)
   where
     -- strftime() returns 0 if the result does not fit in the buffer.
-    -- Retry with a larger buffer but give up at a bound.
-    limit = 80 + 64 * Data.ByteString.Char8.length fmt
+    -- Retry with a larger buffer but give up at a bound
+    -- which also covers field widths such as "%100Y".
+    limit :: Int
+    limit = fromInteger $ min (1024 * 1024) $
+        80 + 64 * toInteger (BS.length fmt) + sum (map (read . BS.unpack) widths)
+    widths = filter (not . BS.null) $ BS.splitWith (not . isDigit) fmt
     loop cfmt siz = do
-        ptr <- mallocBytes siz
-        len <- withTZLock $ fromIntegral <$> formatFun cfmt sec ptr (fromIntegral siz)
-        if len == 0 && siz < limit
-            then free ptr >> loop cfmt (siz * 2)
-            else do
-                ptr' <- reallocBytes ptr (max 1 len)
-                unsafePackMallocCStringLen (ptr', len)
+        bs <- createAndTrim siz $ \ptr ->
+            fromIntegral <$> formatFun cfmt sec (castPtr ptr) (fromIntegral siz)
+        if BS.null bs && siz < limit
+            then loop cfmt (siz * 2)
+            else return bs
 
 ----------------------------------------------------------------
 

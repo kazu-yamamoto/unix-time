@@ -1,20 +1,23 @@
 /* cbits/config.h.in.  Generated from configure.ac by autoheader.  */
 
-/* Define to 1 if you have the declaration of `_mkgmtime', and to 0 if you
+/* Define to 1 if you have the declaration of '_mkgmtime', and to 0 if you
    don't. */
 #undef HAVE_DECL__MKGMTIME
 
 /* Define to 1 if you have the <inttypes.h> header file. */
 #undef HAVE_INTTYPES_H
 
-/* Define to 1 if you have the <memory.h> header file. */
-#undef HAVE_MEMORY_H
-
 /* Define to 1 if you have the <stdint.h> header file. */
 #undef HAVE_STDINT_H
 
+/* Define to 1 if you have the <stdio.h> header file. */
+#undef HAVE_STDIO_H
+
 /* Define to 1 if you have the <stdlib.h> header file. */
 #undef HAVE_STDLIB_H
+
+/* Define to 1 if you have the 'strftime_l' function. */
+#undef HAVE_STRFTIME_L
 
 /* Define to 1 if you have the <strings.h> header file. */
 #undef HAVE_STRINGS_H
@@ -22,14 +25,20 @@
 /* Define to 1 if you have the <string.h> header file. */
 #undef HAVE_STRING_H
 
-/* Define to 1 if you have the `strptime_l' function. */
+/* Define to 1 if you have the 'strptime_l' function. */
 #undef HAVE_STRPTIME_L
 
-/* Define to 1 if you have the `strtoll_l' function. */
+/* Define to 1 if you have the 'strtoll_l' function. */
 #undef HAVE_STRTOLL_L
 
-/* Define to 1 if you have the `strtol_l' function. */
+/* Define to 1 if you have the 'strtol_l' function. */
 #undef HAVE_STRTOL_L
+
+/* Define to 1 if 'tm_gmtoff' is a member of 'struct tm'. */
+#undef HAVE_STRUCT_TM_TM_GMTOFF
+
+/* Define to 1 if 'tm_zone' is a member of 'struct tm'. */
+#undef HAVE_STRUCT_TM_TM_ZONE
 
 /* Define to 1 if you have the <sys/stat.h> header file. */
 #undef HAVE_SYS_STAT_H
@@ -37,7 +46,7 @@
 /* Define to 1 if you have the <sys/types.h> header file. */
 #undef HAVE_SYS_TYPES_H
 
-/* Define to 1 if you have the `timegm' function. */
+/* Define to 1 if you have the 'timegm' function. */
 #undef HAVE_TIMEGM
 
 /* Define to 1 if you have the <unistd.h> header file. */
@@ -46,26 +55,23 @@
 /* Define to 1 if you have the <xlocale.h> header file. */
 #undef HAVE_XLOCALE_H
 
-/* Define to 1 if you have the `_create_locale' function. */
+/* Define to 1 if you have the '_create_locale' function. */
 #undef HAVE__CREATE_LOCALE
 
-/* Define to 1 if you have the `_get_current_locale' function. */
+/* Define to 1 if you have the '_get_current_locale' function. */
 #undef HAVE__GET_CURRENT_LOCALE
 
-/* Define to 1 if you have the `_isblank_l' function. */
+/* Define to 1 if you have the '_isblank_l' function. */
 #undef HAVE__ISBLANK_L
 
-/* Define to 1 if you have the `_isdigit_l' function. */
+/* Define to 1 if you have the '_isdigit_l' function. */
 #undef HAVE__ISDIGIT_L
 
-/* Define to 1 if you have the `_isspace_l' function. */
+/* Define to 1 if you have the '_isspace_l' function. */
 #undef HAVE__ISSPACE_L
 
-/* Define to 1 if you have the `_isupper_l' function. */
+/* Define to 1 if you have the '_isupper_l' function. */
 #undef HAVE__ISUPPER_L
-
-/* "Is Linux" */
-#undef IS_LINUX
 
 /* "Is Windows NT 6.1" */
 #undef IS_NT61
@@ -88,5 +94,7 @@
 /* Define to the version of this package. */
 #undef PACKAGE_VERSION
 
-/* Define to 1 if you have the ANSI C header files. */
+/* Define to 1 if all of the C89 standard headers exist (not just the ones
+   required in a freestanding environment). This macro is provided for
+   backward compatibility; new code need not use it. */
 #undef STDC_HEADERS
