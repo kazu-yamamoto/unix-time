@@ -15,7 +15,8 @@ their types. Please check the following before upgrading.
 * `parseUnixTime` and `parseUnixTimeGMT` honor the offset of `%z`
   on glibc. It was ignored.
 * The GMT functions no longer modify the `TZ` environment variable,
-  so they no longer call `tzset()` as a side effect.
+  which could be corrupted by concurrent calls. So they no longer
+  call `tzset()` as a side effect.
 * `addUnixDiffTime` normalizes `utMicroSeconds` into `[0, 1000000)`
   also for times before 1970.
 * The `Binary` instance of `UnixTime` always encodes seconds as
@@ -24,22 +25,13 @@ their types. Please check the following before upgrading.
 
 Other changes:
 
+* Security: `formatUnixTime` and `formatUnixTimeGMT` read beyond a
+  heap buffer when the output exceeded 80 bytes. Now the buffer grows.
 * New: `parseUnixTimeMaybe` and `parseUnixTimeGMTMaybe`.
 * Fix `*`, `negate`, `abs` and `signum` of `UnixDiffTime`.
-* Remove the global lock introduced in v0.5.1.
 * Use `strptime_l()`/`strftime_l()` on Linux instead of changing
   the process-global locale.
 * Require `base` >= 4.9.
-
-## v0.5.1
-
-* Security: `formatUnixTime` and `formatUnixTimeGMT` read beyond a
-  heap buffer when the output exceeded 80 bytes. Now the buffer grows.
-* Security: concurrent calls of the GMT functions could leave the
-  process-global `TZ` corrupted. Calls are now serialized and the old
-  `TZ` value is copied before being restored.
-* Windows: fix a heap overflow in `_patch_unsetenv`, which also failed
-  to unset `TZ`.
 
 ## v0.5.0
 
